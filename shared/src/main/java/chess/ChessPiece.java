@@ -12,6 +12,11 @@ import java.util.Objects;
  */
 public class ChessPiece {
     ChessGame.TeamColor color;
+    ChessPiece.PieceType type;
+    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.color = pieceColor;
+        this.type = type;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -33,12 +38,6 @@ public class ChessPiece {
     @Override
     public String toString() {
         return this.color + "-" + this.type;
-    }
-
-    ChessPiece.PieceType type;
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.color = pieceColor;
-        this.type = type;
     }
 
     /**
@@ -76,6 +75,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         MovesCalculator calculator = new MovesCalculator(board, myPosition);
-        return calculator.bishopMoves();
+        return calculator.PossibleMoves(this.type, this.color);
     }
 }
