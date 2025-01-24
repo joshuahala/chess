@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -10,8 +11,41 @@ import java.util.ArrayList;
  */
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8];
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(squares);
+    }
+
     public ChessBoard() {
 
+    }
+
+    @Override
+    public String toString() {
+        String board = "";
+        for (int i=0; i<8; i++) {
+            for (int j=0; j<8; j++) {
+                if (this.squares[i][j] != null) {
+
+                    String pieceString = this.squares[i][j].toString();
+                    board += pieceString + " ";
+                }
+            }
+        }
+        return board;
     }
 
     /**
@@ -44,7 +78,7 @@ public class ChessBoard {
 
         for (int i=0; i<8; i++) {
             ChessPiece piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            this.squares[2][i] = piece;
+            this.squares[1][i] = piece;
         }
         // set up remaining white pieces
         this.squares[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
@@ -60,7 +94,7 @@ public class ChessBoard {
 
         for (int i=0; i<8; i++) {
             ChessPiece piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            this.squares[7][i] = piece;
+            this.squares[6][i] = piece;
         }
         // set up remaining BLACK pieces
         this.squares[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);

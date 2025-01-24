@@ -30,6 +30,11 @@ public class ChessPiece {
         return Objects.hash(color, type);
     }
 
+    @Override
+    public String toString() {
+        return this.color + "-" + this.type;
+    }
+
     ChessPiece.PieceType type;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
