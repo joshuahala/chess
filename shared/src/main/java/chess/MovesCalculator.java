@@ -27,9 +27,9 @@ public class MovesCalculator {
             case PAWN -> {
                 return this.PawnMoves();
             }
-//            case ROOK -> {
-//                return this.RookMoves();
-//            }
+            case ROOK -> {
+                return this.RookMoves();
+            }
             case KNIGHT -> {
                 return this.KnightMoves();
             }
@@ -281,6 +281,67 @@ public class MovesCalculator {
         return moves;
     }
 
+    public ArrayList<ChessMove> RookMoves() {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ArrayList<ChessMove> finalList = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        ChessPosition startPosition = new ChessPosition(row, col);
+        ChessPosition newPosition;
 
+        for (int i = row + 1; i < 9; i ++) {
+            newPosition = new ChessPosition(i, col);
+            if (IsInBounds(newPosition)) {
+                if (board.getPiece(newPosition) == null) {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
+                    break;
+                } else {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+            }
+        }
+        for (int i = row - 1; i > 0; i --) {
+            newPosition = new ChessPosition(i, col);
+            if (IsInBounds(newPosition)) {
+                if (board.getPiece(newPosition) == null) {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
+                    break;
+                } else {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+            }
+        }
+        for (int j = col + 1; j < 9; j ++) {
+            newPosition = new ChessPosition(row, j);
+            if (IsInBounds(newPosition)) {
+                if (board.getPiece(newPosition) == null) {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
+                    break;
+                } else {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+            }
+        }
+        for (int j = col - 1; j > 0; j --) {
+            newPosition = new ChessPosition(row, j);
+            if (IsInBounds(newPosition)) {
+                if (board.getPiece(newPosition) == null) {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
+                    break;
+                } else {
+                    moves.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+            }
+        }
+        return moves;
+    }
 
 }
