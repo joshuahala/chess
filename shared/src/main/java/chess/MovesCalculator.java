@@ -36,9 +36,9 @@ public class MovesCalculator {
             case BISHOP -> {
                 return this.BishopMoves();
             }
-//            case QUEEN -> {
-//                return this.QueenMoves();
-//            }
+            case QUEEN -> {
+                return this.QueenMoves();
+            }
             case KING -> {
                 return this.KingMoves();
             }
@@ -343,5 +343,13 @@ public class MovesCalculator {
         }
         return moves;
     }
+    public ArrayList<ChessMove> QueenMoves() {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ArrayList<ChessMove> bishopMoves = BishopMoves();
+        ArrayList<ChessMove> rookMoves = RookMoves();
+        moves.addAll(bishopMoves);
+        moves.addAll(rookMoves);
 
+        return moves;
+    }
 }
