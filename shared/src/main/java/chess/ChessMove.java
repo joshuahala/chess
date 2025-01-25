@@ -32,7 +32,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "" + this.startPosition + "->" + this.endPosition + " ";
+        return "" + this.startPosition + "->" + this.endPosition + this.promotionType + " ";
     }
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
