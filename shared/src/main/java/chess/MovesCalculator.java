@@ -30,9 +30,9 @@ public class MovesCalculator {
 //            case ROOK -> {
 //                return this.RookMoves();
 //            }
-//            case KNIGHT -> {
-//                return this.KnightMoves();
-//            }
+            case KNIGHT -> {
+                return this.KnightMoves();
+            }
             case BISHOP -> {
                 return this.BishopMoves();
             }
@@ -143,6 +143,37 @@ public class MovesCalculator {
         moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col-1), null));
         moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col-1), null));
         moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col+1), null));
+        for (ChessMove move : moves) {
+            if (!IsInBounds(move.getEndPosition())) {
+                continue;
+            }
+            if (board.getPiece(move.getEndPosition()) != null) {
+                if (board.getPiece(move.getEndPosition()).getTeamColor() == this.color) {
+                    continue;
+                }
+
+            }
+            finalList.add(move);
+        }
+
+        return finalList;
+    }
+
+    public ArrayList<ChessMove> KnightMoves() {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ArrayList<ChessMove> finalList = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        ChessPosition startPosition = new ChessPosition(row, col);
+
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+2, col+1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col+2), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-2, col-1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col-2), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col-2), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col+2), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-2, col+1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+2, col-1), null));
         for (ChessMove move : moves) {
             if (!IsInBounds(move.getEndPosition())) {
                 continue;
