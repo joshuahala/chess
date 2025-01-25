@@ -15,6 +15,12 @@ public class MovesCalculator {
 
     }
 
+    private boolean IsInBounds(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
+
     public ArrayList<ChessMove> PossibleMoves(ChessPiece.PieceType type, ChessGame.TeamColor color) {
         this.color = color;
         switch(type) {
@@ -33,9 +39,9 @@ public class MovesCalculator {
 //            case QUEEN -> {
 //                return this.QueenMoves();
 //            }
-//            case KING -> {
-//                return this.KingMoves();
-//            }
+            case KING -> {
+                return this.KingMoves();
+            }
             default -> throw new IllegalArgumentException("Invalid piece type: " + type);
         }
     }
@@ -120,5 +126,36 @@ public class MovesCalculator {
         }
 
         return moves;
+    }
+
+    public ArrayList<ChessMove> KingMoves() {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        ArrayList<ChessMove> finalList = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        ChessPosition startPosition = new ChessPosition(row, col);
+
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row, col+1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row, col-1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col+1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row+1, col-1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col-1), null));
+        moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col+1), null));
+        for (ChessMove move : moves) {
+            if (!IsInBounds(move.getEndPosition())) {
+                continue;
+            }
+            if (board.getPiece(move.getEndPosition()) != null) {
+                if (board.getPiece(move.getEndPosition()).getTeamColor() == this.color) {
+                    continue;
+                }
+
+            }
+            finalList.add(move);
+        }
+
+        return finalList;
     }
 }
