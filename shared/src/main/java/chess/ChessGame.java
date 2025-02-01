@@ -111,7 +111,72 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessPosition> threateningPositions = new ArrayList<>();
+        ChessPosition kingPosition = null;
+        ArrayList<ChessPosition> enemyMoves = new ArrayList<>();
+        // check if is in check
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+        // get array of all opponents possible moves
+        for (int row = 1; row < 8; row ++) {
+            for (int col =1; col < 8; col ++) {
+                ChessPosition iteratedPosition = new ChessPosition(row, col);
+                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                if (iteratedPiece != null && iteratedPiece.getPieceType() == ChessPiece.PieceType.KING && iteratedPiece.getTeamColor() == teamColor) {
+                    kingPosition = iteratedPosition;
+                    break;
+                }
+            }
+        }
+        for (int row = 1; row < 8; row ++) {
+            for (int col = 1; col < 8; col++) {
+                ChessPosition iteratedPosition = new ChessPosition(row, col);
+                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                if (iteratedPiece != null) {
+                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(this.gameBoard, iteratedPosition);
+                    for (ChessMove possibleMove : pieceMoves) {
+                        ChessPosition possibleEndPosition = possibleMove.getEndPosition();
+                        enemyMoves.add(possibleEndPosition);
+                        if (kingPosition != null && possibleEndPosition.thisRow == kingPosition.thisRow && possibleEndPosition.thisCol == kingPosition.thisCol) {
+                            // if piece can capture king, add the piece to the threateningPositions list
+                            threateningPositions.add(iteratedPosition);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // store positions of pieces that pose a threat
+        // see if king's possible moves are not in array of enemy moves
+        ChessPiece kingPiece = this.gameBoard.getPiece(kingPosition);
+        Collection<ChessMove> kingsMoves = kingPiece.pieceMoves(this.gameBoard, kingPosition);
+        for (ChessMove kingMove : kingsMoves) {
+            if (!enemyMoves.contains(kingMove.getEndPosition())) {
+                return false; // there is a position the king can move to which is not under attack
+            }
+        }
+        // get array of friendly moves
+        for (int row = 1; row < 8; row ++) {
+            for (int col = 1; col < 8; col++) {
+                ChessPosition iteratedPosition = new ChessPosition(row, col);
+                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                if (iteratedPiece != null && iteratedPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(this.gameBoard, iteratedPosition);
+                    for (ChessMove possibleMove : pieceMoves) {
+                        ChessPosition possibleEndPosition = possibleMove.getEndPosition();
+                        for (ChessPosition enemyPosition : threateningPositions) {
+                            if (enemyPosition == possibleEndPosition && threateningPositions.size() < 2) {
+                                return false; // friendly piece can capture the threatening piece; no checkmate
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // check if friendly moves intersects with positions of the threatening pieces
+        // check if friendly moves can block
+        return true;
     }
 
     /**

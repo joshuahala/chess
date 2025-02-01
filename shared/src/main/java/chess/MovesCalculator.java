@@ -190,6 +190,7 @@ public class MovesCalculator {
         return finalList;
     }
 
+
     private boolean ShouldPromote(ChessPosition newPosition) {
         if (this.color == ChessGame.TeamColor.WHITE) {
             if (newPosition.getRow() == 8) {
