@@ -71,6 +71,15 @@ public class ChessBoard {
     }
 
     /**
+     * removes a chess piece from the chessboard
+     *
+     * @param position which position to vacate
+     */
+    public void removePiece(ChessPosition position) {
+        squares[position.thisRow-1][position.thisCol-1] = null;
+    }
+
+    /**
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
