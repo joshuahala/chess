@@ -115,12 +115,20 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> validMoves = this.validMoves(move.getStartPosition());
-        if (validMoves != null && validMoves.contains(move)) {
+        ChessPiece piece = this.gameBoard.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            piece.type = move.getPromotionPiece();
+        }
+        if (validMoves != null && piece.getTeamColor() == teamTurn && validMoves.contains(move)) {
             ChessPosition startPos = move.getStartPosition();
             ChessPosition endPos = move.getEndPosition();
-            ChessPiece piece = this.gameBoard.getPiece(startPos);
             this.gameBoard.addPiece(endPos,piece);
             this.gameBoard.squares[startPos.getRow()-1][startPos.getColumn()-1] = null;
+            if (teamTurn == TeamColor.BLACK) {
+                teamTurn = TeamColor.WHITE;
+            } else {
+                teamTurn = TeamColor.BLACK;
+            }
         } else {
             throw new InvalidMoveException("Not a valid move");
         }
