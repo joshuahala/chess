@@ -60,7 +60,7 @@ public class ChessGame {
         for (ChessMove possibleMove : pieceMoves) {
             ChessBoard boardCopy = new ChessBoard(this.gameBoard);
             ChessPosition endPosition = possibleMove.getEndPosition();
-            boardCopy.squares[endPosition.getRow()-1][endPosition.getColumn()-1] = this.gameBoard.getPiece(startPosition);
+            boardCopy.addPiece(endPosition, this.gameBoard.getPiece(startPosition));
             boardCopy.squares[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
 
             boolean result = this.checkForCheck(boardCopy, teamColor);
