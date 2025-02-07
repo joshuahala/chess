@@ -68,6 +68,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         squares[position.thisRow-1][position.thisCol-1] = piece;
+        // test commit
     }
 
     /**
