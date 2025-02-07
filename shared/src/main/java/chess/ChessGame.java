@@ -54,6 +54,7 @@ public class ChessGame {
         if (this.gameBoard.getPiece(startPosition) == null) {
             return null;
         }
+        ChessGame.TeamColor teamColor = this.gameBoard.getPiece(startPosition).getTeamColor();
         Collection<ChessMove> pieceMoves = this.gameBoard.getPiece(startPosition).pieceMoves(this.gameBoard,startPosition);
         ArrayList<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove possibleMove : pieceMoves) {
@@ -62,7 +63,7 @@ public class ChessGame {
             boardCopy.squares[endPosition.getRow()-1][endPosition.getColumn()-1] = this.gameBoard.getPiece(startPosition);
             boardCopy.squares[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
 
-            boolean result = this.checkForCheck(boardCopy, this.teamTurn);
+            boolean result = this.checkForCheck(boardCopy, teamColor);
             if (!result) {
                 validMoves.add(possibleMove);
             }
@@ -80,6 +81,7 @@ public class ChessGame {
             for (int col =1; col <= 8; col ++) {
                 ChessPosition iteratedPosition = new ChessPosition(row, col);
                 ChessPiece iteratedPiece = board.getPiece(iteratedPosition);
+
                 if (iteratedPiece != null && iteratedPiece.getPieceType() == ChessPiece.PieceType.KING && iteratedPiece.getTeamColor() == teamColor) {
                     kingPosition = iteratedPosition;
                     break;
