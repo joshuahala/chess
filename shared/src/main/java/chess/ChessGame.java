@@ -1,5 +1,6 @@
 package chess;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -50,47 +51,47 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if (this.gameBoard.getPiece(startPosition) == null) {
+            return null;
+        }
+        Collection<ChessMove> pieceMoves = this.gameBoard.getPiece(startPosition).pieceMoves(this.gameBoard,startPosition);
+        ArrayList<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove possibleMove : pieceMoves) {
+            ChessBoard boardCopy = new ChessBoard(this.gameBoard);
+            ChessPosition endPosition = possibleMove.getEndPosition();
+            boardCopy.squares[endPosition.getRow()-1][endPosition.getColumn()-1] = this.gameBoard.getPiece(startPosition);
+            boardCopy.squares[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
+
+            boolean result = this.checkForCheck(boardCopy, this.teamTurn);
+            if (!result) {
+                validMoves.add(possibleMove);
+            }
+        }
+        return validMoves;
     }
 
-    /**
-     * Makes a move in a chess game
-     *
-     * @param move chess move to preform
-     * @throws InvalidMoveException if move is invalid
-     */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    /**
-     * Determines if the given team is in check
-     *
-     * @param teamColor which team to check for check
-     * @return True if the specified team is in check
-     */
-    public boolean isInCheck(TeamColor teamColor) {
+    public boolean checkForCheck(ChessBoard board, TeamColor teamColor) {
         // for each of the opponent's pieces
         //    if any one of the piece's possible moves is the same
         //    as the king's position, then return true
-        Boolean result = false;
+        boolean result = false;
         ChessPosition kingPosition = null;
-        for (int row = 1; row < 8; row ++) {
-            for (int col =1; col < 8; col ++) {
+        for (int row = 1; row <= 8; row ++) {
+            for (int col =1; col <= 8; col ++) {
                 ChessPosition iteratedPosition = new ChessPosition(row, col);
-                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                ChessPiece iteratedPiece = board.getPiece(iteratedPosition);
                 if (iteratedPiece != null && iteratedPiece.getPieceType() == ChessPiece.PieceType.KING && iteratedPiece.getTeamColor() == teamColor) {
                     kingPosition = iteratedPosition;
                     break;
                 }
             }
         }
-        for (int row = 1; row < 8; row ++) {
-            for (int col = 1; col < 8; col++) {
+        for (int row = 1; row <= 8; row ++) {
+            for (int col = 1; col <= 8; col++) {
                 ChessPosition iteratedPosition = new ChessPosition(row, col);
-                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                ChessPiece iteratedPiece = board.getPiece(iteratedPosition);
                 if (iteratedPiece != null) {
-                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(this.gameBoard, iteratedPosition);
+                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(board, iteratedPosition);
                     for (ChessMove possibleMove : pieceMoves) {
                         ChessPosition possibleEndPosition = possibleMove.getEndPosition();
                         if (kingPosition != null && possibleEndPosition.thisRow == kingPosition.thisRow && possibleEndPosition.thisCol == kingPosition.thisCol) {
@@ -102,6 +103,35 @@ public class ChessGame {
             }
         }
         return result;
+    }
+
+    /**
+     * Makes a move in a chess game
+     *
+     * @param move chess move to preform
+     * @throws InvalidMoveException if move is invalid
+     */
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        Collection<ChessMove> validMoves = this.validMoves(move.getStartPosition());
+        if (validMoves != null && validMoves.contains(move)) {
+            ChessPosition startPos = move.getStartPosition();
+            ChessPosition endPos = move.getEndPosition();
+            ChessPiece piece = this.gameBoard.getPiece(startPos);
+            this.gameBoard.addPiece(endPos,piece);
+            this.gameBoard.squares[startPos.getRow()-1][startPos.getColumn()-1] = null;
+        } else {
+            throw new InvalidMoveException("Not a valid move");
+        }
+    }
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to check for check
+     * @return True if the specified team is in check
+     */
+    public boolean isInCheck(TeamColor teamColor) {
+        return this.checkForCheck(this.gameBoard, teamColor);
     }
 
     /**
@@ -118,64 +148,19 @@ public class ChessGame {
         if (!isInCheck(teamColor)) {
             return false;
         }
-        // get array of all opponents possible moves
-        for (int row = 1; row < 8; row ++) {
-            for (int col =1; col < 8; col ++) {
+        for (int row = 1; row <= 8; row ++) {
+            for (int col =1; col <= 8; col ++) {
                 ChessPosition iteratedPosition = new ChessPosition(row, col);
                 ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
-                if (iteratedPiece != null && iteratedPiece.getPieceType() == ChessPiece.PieceType.KING && iteratedPiece.getTeamColor() == teamColor) {
-                    kingPosition = iteratedPosition;
-                    break;
+                if (iteratedPiece != null && iteratedPiece.getTeamColor() != teamColor) {
+                    continue;
+                }
+                Collection<ChessMove> validMoves = this.validMoves(iteratedPosition);
+                if (validMoves != null && validMoves.size() > 0) {
+                    return false;
                 }
             }
         }
-        for (int row = 1; row < 8; row ++) {
-            for (int col = 1; col < 8; col++) {
-                ChessPosition iteratedPosition = new ChessPosition(row, col);
-                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
-                if (iteratedPiece != null) {
-                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(this.gameBoard, iteratedPosition);
-                    for (ChessMove possibleMove : pieceMoves) {
-                        ChessPosition possibleEndPosition = possibleMove.getEndPosition();
-                        enemyMoves.add(possibleEndPosition);
-                        if (kingPosition != null && possibleEndPosition.thisRow == kingPosition.thisRow && possibleEndPosition.thisCol == kingPosition.thisCol) {
-                            // if piece can capture king, add the piece to the threateningPositions list
-                            threateningPositions.add(iteratedPosition);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        // store positions of pieces that pose a threat
-        // see if king's possible moves are not in array of enemy moves
-        ChessPiece kingPiece = this.gameBoard.getPiece(kingPosition);
-        Collection<ChessMove> kingsMoves = kingPiece.pieceMoves(this.gameBoard, kingPosition);
-        for (ChessMove kingMove : kingsMoves) {
-            if (!enemyMoves.contains(kingMove.getEndPosition())) {
-                return false; // there is a position the king can move to which is not under attack
-            }
-        }
-        // get array of friendly moves
-        for (int row = 1; row < 8; row ++) {
-            for (int col = 1; col < 8; col++) {
-                ChessPosition iteratedPosition = new ChessPosition(row, col);
-                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
-                if (iteratedPiece != null && iteratedPiece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> pieceMoves = iteratedPiece.pieceMoves(this.gameBoard, iteratedPosition);
-                    for (ChessMove possibleMove : pieceMoves) {
-                        ChessPosition possibleEndPosition = possibleMove.getEndPosition();
-                        for (ChessPosition enemyPosition : threateningPositions) {
-                            if (enemyPosition == possibleEndPosition && threateningPositions.size() < 2) {
-                                return false; // friendly piece can capture the threatening piece; no checkmate
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // check if friendly moves intersects with positions of the threatening pieces
-        // check if friendly moves can block
         return true;
     }
 
@@ -187,7 +172,23 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (this.isInCheckmate(teamColor)) {
+            return false;
+        }
+        ArrayList<ChessMove> validMoves = new ArrayList<>();
+        for (int row = 1; row <= 8; row ++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition iteratedPosition = new ChessPosition(row, col);
+                ChessPiece iteratedPiece = this.gameBoard.getPiece(iteratedPosition);
+                if (iteratedPiece != null && iteratedPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> pieceMoves = this.validMoves(iteratedPosition);
+                    if (pieceMoves != null && pieceMoves.size() > 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**

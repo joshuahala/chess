@@ -10,7 +10,7 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    public ChessPiece[][] squares = new ChessPiece[8][8];
 
     @Override
     public boolean equals(Object o) {
@@ -31,6 +31,18 @@ public class ChessBoard {
 
     public ChessBoard() {
 
+    }
+
+    public ChessBoard(ChessBoard other) {
+        this.squares = new ChessPiece[8][8];
+        for (int i=0; i<8; i++) {
+            for (int j=0; j<8; j++) {
+                ChessPiece otherPiece = other.squares[i][j];
+                if (otherPiece != null) {
+                    this.squares[i][j] = new ChessPiece(otherPiece.getTeamColor(), otherPiece.getPieceType());
+                }
+            }
+        }
     }
 
     @Override
