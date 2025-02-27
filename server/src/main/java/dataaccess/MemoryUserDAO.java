@@ -8,10 +8,11 @@ import java.util.HashMap;
 public class MemoryUserDAO implements UserDAO {
     HashMap<String, UserData> userList = new HashMap<>();
 
-    public UserData addUser(UserData userData) {
+    public UserData createUser(UserData userData) {
         userList.put(userData.username(), userData);
         return userData;
     }
+
 
     public UserData getUser(String username) {
         return userList.get(username);

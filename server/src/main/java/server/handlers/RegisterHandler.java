@@ -6,15 +6,15 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import com.google.gson.Gson;
-import model.UserData;
+import model.*;
 
 public class RegisterHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
         var userData = new Gson().fromJson(req.body(), UserData.class);
         UserService service = new UserService();
-        userData = service.register(userData);
+        RegisterResult registerResult = service.register(userData);
 
-        return new Gson().toJson(userData);
+        return new Gson().toJson(registerResult);
     }
 }
