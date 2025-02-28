@@ -4,6 +4,7 @@ import dataaccess.DataAccessException;
 import model.RegisterResult;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import spark.utils.Assert;
 
 public class UserServiceTests {
     @Test
@@ -36,5 +37,18 @@ public class UserServiceTests {
         Assertions.assertEquals(expectedUser, retrievedUser,
                 "This is not the user you are looking for");
 
+    }
+
+    @Test
+    public void getUserOnEmptyDataBaseReturnsError() throws DataAccessException {
+        UserService service = new UserService();
+        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
+
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+        RegisterResult registerResult = service.register(userData);
+        service.deleteAllUsers();
+        UserData retrievedUser = service.userDAO.getUser("Jeremy");
+
+        Assert.isTrue(retrievedUser == null, "Actually it does exist");
     }
 }
