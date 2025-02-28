@@ -3,6 +3,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.*;
+import org.eclipse.jetty.util.log.Log;
 
 
 import java.util.UUID;
@@ -32,6 +33,24 @@ public class UserService {
         return new RegisterResult(authToken, userData.username());
     }
 
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        // Get User info
+        UserData userData = userDAO.getUser(loginRequest.username());
+        // If null, throw error
+        if (userData == null) {
+            throw new DataAccessException("This person doesn't exist");
+        }
+
+        // check password
+        // if wrong password, send error response
+        if (loginRequest.password() != userData.password()) {
+            throw new DataAccessException("Wrong password, silly");
+        }
+        // if correct password, create authdata
+        // return username and authtoken
+        LoginResult loginResult = new LoginResult(userData.username(), userData.password());
+        return loginResult;
+    }
 
     public void deleteAllUsers() {
         userDAO.deleteAllUsers();
