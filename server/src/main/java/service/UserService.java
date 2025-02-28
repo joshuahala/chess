@@ -31,4 +31,13 @@ public class UserService {
         // return registerResult
         return new RegisterResult(authToken, userData.username());
     }
+
+
+    public void deleteAllUsers() {
+        userDAO.deleteAllUsers();
+    }
+
+    public void deleteAllAuthData() {
+        authDAO.deleteAllAuthData();
+    }
 }

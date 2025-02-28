@@ -21,4 +21,8 @@ public class MemoryUserDAO implements UserDAO {
     public void deleteUser(String username) {
         userList.remove(username);
     }
+
+    public void deleteAllUsers() {
+        userList = new HashMap<>();
+    }
 }
