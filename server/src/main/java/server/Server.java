@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import spark.*;
 import server.handlers.*;
 
@@ -14,7 +15,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.exception(Exception.class, this::errorHandler);
+        Spark.exception(DataAccessException.class, this::errorHandler);
         Spark.post("/user", new RegisterHandler());
         Spark.delete("/db", new ClearHandler());
         Spark.post("/session", new LoginHandler());
@@ -31,11 +32,9 @@ public class Server {
         Spark.awaitStop();
     }
 
-    public Object errorHandler(Exception e, Request req, Response res) {
-        var body = new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false));
-        res.type("application/json");
-        res.status(500);
-        res.body(body);
-        return body;
+    public void errorHandler(DataAccessException e, Request req, Response res) {
+        res.status(e.getErrorCode());
+        res.body(e.getBody());
+
     }
 }

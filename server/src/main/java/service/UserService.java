@@ -6,6 +6,7 @@ import model.*;
 import org.eclipse.jetty.util.log.Log;
 
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -18,7 +19,7 @@ public class UserService {
     public RegisterResult register(UserData userData) throws DataAccessException {
         //check if user exists
         if (userDAO.getUser(userData.username()) != null) {
-            throw new DataAccessException("This user already exists");
+            throw new DataAccessException(403,"This user already exists");
         }
         //if not, then create user data
         //add userdata
@@ -38,13 +39,13 @@ public class UserService {
         UserData userData = userDAO.getUser(loginRequest.username());
         // If null, throw error
         if (userData == null) {
-            throw new DataAccessException("This person doesn't exist");
+            throw new DataAccessException(404, "This person doesn't exist");
         }
 
         // check password
         // if wrong password, send error response
-        if (loginRequest.password() != userData.password()) {
-            throw new DataAccessException("Wrong password, silly");
+        if (!Objects.equals(loginRequest.password(), userData.password())) {
+            throw new DataAccessException(401, "Unauthorized");
         }
         // if correct password, create authdata
         // return username and authtoken
