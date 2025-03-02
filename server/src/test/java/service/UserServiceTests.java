@@ -6,6 +6,8 @@ import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.*;
 import spark.utils.Assert;
 
+import java.util.Locale;
+
 public class UserServiceTests {
     @Test
     @DisplayName("Register User")
@@ -23,6 +25,23 @@ public class UserServiceTests {
                 "These are not the same, bro");
         Assertions.assertInstanceOf(String.class,resultToken);
     }
+
+    @Test
+    @DisplayName("Try to register user twice")
+    public void registerUserTwiceGivesError() throws DataAccessException {
+        UserService service = new UserService();
+        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
+        String expectedName = "Jeremy";
+
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+        RegisterResult registerResult = service.register(userData);
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            service.register(userData);
+
+        });
+    }
+
     @Test
     @DisplayName("Get User Info")
     public void getUserInfo() throws DataAccessException {
