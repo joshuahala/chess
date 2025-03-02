@@ -17,6 +17,10 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
     public RegisterResult register(UserData userData) throws DataAccessException {
+        // ensure strings are not empty
+        if (Objects.equals(userData.username(), "") || Objects.equals(userData.password(), "") || Objects.equals(userData.email(), "")) {
+            throw new DataAccessException(401, "bad request");
+        }
         //check if user exists
         if (userDAO.getUser(userData.username()) != null) {
             throw new DataAccessException(403,"This user already exists");

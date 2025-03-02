@@ -4,6 +4,8 @@ import dataaccess.DataAccessException;
 import model.*;
 import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import spark.utils.Assert;
 
 import java.util.Locale;
@@ -41,6 +43,27 @@ public class UserServiceTests {
 
         });
     }
+
+    @ParameterizedTest
+    @DisplayName("Empty Strings in register request")
+    @CsvSource({
+            "'',secret,jeremy@gmail.com", // Empty username
+            "username,'',jeremy@gmail.com", // Empty password
+            "username,secret,''"          // Empty email
+    })
+    public void emptyRegisterStringThrowsError(String username, String password, String email) {
+        // Arrange: Set up the UserService and the input JSON
+        UserService service = new UserService();
+        String jsonInput = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}", username, password, email);
+
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+
+        // Act & Assert: Check that the exception is thrown when registering with empty fields
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            service.register(userData);
+        });
+    }
+
 
     @Test
     @DisplayName("Get User Info")
