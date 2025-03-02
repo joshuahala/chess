@@ -57,6 +57,17 @@ public class UserService {
         return loginResult;
     }
 
+    public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
+        // check for authData
+        if (authDAO.getAuth(logoutRequest.authToken()) == null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
+        // if authData, then delete it
+        authDAO.deleteAuth(logoutRequest.authToken());
+        return new LogoutResult();
+
+    }
+
     public void deleteAllUsers() {
         userDAO.deleteAllUsers();
     }
