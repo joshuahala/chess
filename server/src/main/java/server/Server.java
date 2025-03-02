@@ -2,6 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryUserDAO;
+import dataaccess.UserDAO;
+import service.UserService;
 import spark.*;
 import server.handlers.*;
 
@@ -14,11 +17,14 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        UserService userService = new UserService();
+
+
         // Register your endpoints and handle exceptions here.
         Spark.exception(DataAccessException.class, this::errorHandler);
-        Spark.post("/user", new RegisterHandler());
+        Spark.post("/user", new RegisterHandler(userService));
         Spark.delete("/db", new ClearHandler());
-        Spark.post("/session", new LoginHandler());
+        Spark.post("/session", new LoginHandler(userService));
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();

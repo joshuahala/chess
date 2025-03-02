@@ -48,8 +48,12 @@ public class UserService {
             throw new DataAccessException(401, "Unauthorized");
         }
         // if correct password, create authdata
+        String authToken = generateToken();
+        AuthData authData = new AuthData(authToken, userData.username());
+        //add authData to database
+        authDAO.createAuth(authToken, authData);
         // return username and authtoken
-        LoginResult loginResult = new LoginResult(userData.username(), userData.password());
+        LoginResult loginResult = new LoginResult(userData.username(), authToken);
         return loginResult;
     }
 
