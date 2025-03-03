@@ -1,5 +1,7 @@
 package server.handlers;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -10,8 +12,8 @@ import model.*;
 public class LogoutHandler implements Route  {
 
     UserService userService;
-    public LogoutHandler(UserService userService) {
-        this.userService = userService;
+    public LogoutHandler(MemoryUserDAO userDAO, MemoryAuthDAO authDAO) {
+        this.userService = new UserService(userDAO, authDAO);
     }
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
