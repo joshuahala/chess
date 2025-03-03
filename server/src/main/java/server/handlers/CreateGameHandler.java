@@ -2,6 +2,8 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import model.CreateGameRequest;
+import model.CreateGameResult;
 import model.LoginRequest;
 import model.LoginResult;
 import service.UserService;
@@ -10,14 +12,14 @@ import spark.Response;
 import spark.Route;
 
 public class CreateGameHandler implements Route {
-    UserService userService;
-    public CreateGameHandler (UserService userService) {
-        this.userService = userService;
+    GameService gameService;
+    public CreateGameHandler (GameService gameService) {
+        this.gameService = gameService;
     }
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
-        LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
-        LoginResult loginResult = userService.login(loginRequest);
-        return new Gson().toJson(loginResult);
+        CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        return new Gson().toJson(createGameResult);
     }
 }
