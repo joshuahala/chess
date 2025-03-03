@@ -26,6 +26,7 @@ public class Server {
         Spark.delete("/db", new ClearHandler());
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogoutHandler(userService));
+        Spark.post("/game", new CreateGameHandler());
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
