@@ -10,8 +10,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    public MemoryUserDAO userDAO = new MemoryUserDAO();
-    public MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    public MemoryUserDAO userDAO;
+    public MemoryAuthDAO authDAO;
+
+    public UserService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+    }
+
 
     public static String generateToken() {
         return UUID.randomUUID().toString();

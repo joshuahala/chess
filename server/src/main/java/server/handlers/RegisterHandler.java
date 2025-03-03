@@ -1,5 +1,6 @@
 package server.handlers;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryUserDAO;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -10,8 +11,8 @@ import model.*;
 public class RegisterHandler implements Route  {
 
     UserService userService;
-    public RegisterHandler(UserService userService) {
-        this.userService = userService;
+    public RegisterHandler(MemoryUserDAO userDAO) {
+        this.userService = new userService(userDAO);
     }
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
