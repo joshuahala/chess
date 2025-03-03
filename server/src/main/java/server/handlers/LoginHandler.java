@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.LoginRequest;
 import model.LoginResult;
-import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 import spark.Request;
 import spark.Response;

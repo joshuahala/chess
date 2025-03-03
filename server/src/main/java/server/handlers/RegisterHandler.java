@@ -1,7 +1,5 @@
 package server.handlers;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDAO;
-import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 import spark.Request;
 import spark.Response;
