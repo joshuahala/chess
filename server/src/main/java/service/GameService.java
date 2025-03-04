@@ -1,23 +1,23 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import model.*;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GameService {
 
     public MemoryGameDAO gameDAO = new MemoryGameDAO();
     public MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    public MemoryUserDAO userDAO = new MemoryUserDAO();
     private int latestID = 1234;
-    public GameService(MemoryGameDAO gameDAO, MemoryAuthDAO authDAO){
-        this.gameDAO = gameDAO;
+    public GameService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO){
+        this.userDAO = userDAO;
         this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
@@ -34,7 +34,7 @@ public class GameService {
         String gameName = createGameRequest.gameName();
         GameData gameData = new GameData(newID, null, null, gameName, game);
         // add gameData to "database"
-        gameDAO.createGame(gameName, gameData);
+        gameDAO.createGame(newID, gameData);
         // return result
         CreateGameResult createGameResult = new CreateGameResult(newID);
         return createGameResult;
@@ -48,6 +48,36 @@ public class GameService {
                 .collect(Collectors.toList());
 
         return new ListGamesResult(modifiedGamesList);
+    }
+
+    public void joinGame(JoinGameRequest joinRequest, String authToken) throws DataAccessException {
+        // verifies that the game exists and adds the caller as the
+        // requested color to the game
+        // returns an object with playerColor and GameID
+
+        // check authorization
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
+        // get userData
+        UserData userData = userDAO.getUser(authData.username());
+
+        // verify game
+        int gameID = Integer.parseInt(joinRequest.gameID());
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new DataAccessException(400, "No such game exists");
+        }
+        if (Objects.equals(joinRequest.playerColor().toLowerCase(), "white")) {
+            GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), null,
+                    gameData.gameName(), gameData.game());
+            gameDAO.updateGame(modifiedGameData);
+        } else {
+            throw new DataAccessException(500, "ITS NOT WHITE");
+        }
+
+
     }
 
     public void deleteAllGames() throws DataAccessException {

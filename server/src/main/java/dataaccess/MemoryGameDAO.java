@@ -10,14 +10,22 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{
     int latestID = 1234;
-    HashMap<String, GameData> gameList = new HashMap<>();
+    HashMap<Integer, GameData> gameList = new HashMap<>();
 
-    public void createGame(String gameName, GameData gameData) throws DataAccessException {
-        this.gameList.put(gameName, gameData);
+    public void createGame(int gameID, GameData gameData) throws DataAccessException {
+        this.gameList.put(gameID, gameData);
     }
 
     public Collection<GameData> getAll() {
         return this.gameList.values();
+    }
+
+    public GameData getGame(int gameID) {
+        return this.gameList.get(gameID);
+    }
+
+    public void updateGame(GameData newGameData) {
+        this.gameList.put(newGameData.gameID(), newGameData);
     }
 
     public void deleteAllGames() throws DataAccessException {
