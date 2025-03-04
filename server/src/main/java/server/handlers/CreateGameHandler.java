@@ -4,15 +4,14 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import model.LoginRequest;
-import model.LoginResult;
+import model.*;
 import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.util.Map;
 
 public class CreateGameHandler implements Route {
     GameService gameService;
@@ -21,7 +20,10 @@ public class CreateGameHandler implements Route {
     }
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
-        CreateGameRequest createGameRequest = new CreateGameRequest(req.headers("authorization"), req.body());
+        CreateGameReqBody body = new Gson().fromJson(req.body(), CreateGameReqBody.class);
+
+        String authToken = req.headers("authorization");
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, body.gameName());
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
         return new Gson().toJson(createGameResult);
     }

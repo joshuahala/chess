@@ -27,8 +27,9 @@ public class Server {
         Spark.post("/session", new LoginHandler(userDAO, authDAO));
         Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
         Spark.post("/game", new CreateGameHandler(gameDAO, authDAO));
+        Spark.get("/game", new ListGamesHandler(gameDAO, authDAO));
 
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
         Spark.awaitInitialization();

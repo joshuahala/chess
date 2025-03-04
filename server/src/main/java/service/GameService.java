@@ -5,9 +5,10 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import model.GameData;
+import model.*;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class GameService {
 
@@ -37,6 +38,16 @@ public class GameService {
         // return result
         CreateGameResult createGameResult = new CreateGameResult(newID);
         return createGameResult;
+    }
+
+    public ListGamesResult getAll() throws DataAccessException {
+        Collection<GameData> gamesList = gameDAO.getAll();
+        Collection<GameDataWithoutGames> modifiedGamesList = gamesList.stream()
+                .map(gameData -> new GameDataWithoutGames(gameData.gameID(), gameData.whiteUsername(),
+                        gameData.blackUsername(), gameData.gameName()))
+                .collect(Collectors.toList());
+
+        return new ListGamesResult(modifiedGamesList);
     }
 
     private int newID() {

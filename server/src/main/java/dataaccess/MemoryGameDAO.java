@@ -4,6 +4,8 @@ import chess.ChessGame;
 import model.CreateGameResult;
 import model.GameData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{
@@ -12,6 +14,10 @@ public class MemoryGameDAO implements GameDAO{
 
     public void createGame(String gameName, GameData gameData) throws DataAccessException {
         this.gameList.put(gameName, gameData);
+    }
+
+    public Collection<GameData> getAll() {
+        return this.gameList.values();
     }
 
 
