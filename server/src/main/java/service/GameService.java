@@ -54,7 +54,10 @@ public class GameService {
         // verifies that the game exists and adds the caller as the
         // requested color to the game
         // returns an object with playerColor and GameID
-
+        // check for null values
+        if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
+            throw new DataAccessException(400, "bad request: please enter a valid value");
+        }
         // check authorization
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -69,6 +72,7 @@ public class GameService {
         if (gameData == null) {
             throw new DataAccessException(400, "No such game exists");
         }
+
         if (Objects.equals(joinRequest.playerColor().toLowerCase(), "white")) {
             GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), null,
                     gameData.gameName(), gameData.game());

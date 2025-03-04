@@ -22,7 +22,7 @@ public class GameServiceTests {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(gameDAO, authDAO);
+        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         var userData = new Gson().fromJson(jsonInput, UserData.class);
 
@@ -45,7 +45,7 @@ public class GameServiceTests {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(gameDAO, authDAO);
+        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
 
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";

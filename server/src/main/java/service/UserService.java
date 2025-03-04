@@ -25,7 +25,10 @@ public class UserService {
     public RegisterResult register(UserData userData) throws DataAccessException {
         // ensure strings are not empty
         if (Objects.equals(userData.username(), "") || Objects.equals(userData.password(), "") || Objects.equals(userData.email(), "")) {
-            throw new DataAccessException(401, "bad request");
+            throw new DataAccessException(400, "bad request");
+        }
+        if (userData.username() == null || userData.password() == null || userData.email() == null) {
+            throw new DataAccessException(400, "bad request");
         }
         //check if user exists
         if (userDAO.getUser(userData.username()) != null) {
@@ -57,6 +60,8 @@ public class UserService {
         if (!Objects.equals(loginRequest.password(), userData.password())) {
             throw new DataAccessException(401, "Unauthorized");
         }
+        // check if user already logged in
+
         // if correct password, create authdata
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());

@@ -3,6 +3,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
+import model.JoinGameResult;
 import service.*;
 import spark.Request;
 import spark.Response;
@@ -26,6 +27,6 @@ public class ClearHandler implements Route {
         userService.deleteAllUsers();
         userService.deleteAllAuthData();
         gameService.deleteAllGames();
-        return new Gson().toJson(res);
+        return new Gson().toJson(new JoinGameResult());
     }
 }
