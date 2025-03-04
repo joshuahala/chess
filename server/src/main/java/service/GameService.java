@@ -73,9 +73,14 @@ public class GameService {
             GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), null,
                     gameData.gameName(), gameData.game());
             gameDAO.updateGame(modifiedGameData);
+        } else if (Objects.equals(joinRequest.playerColor().toLowerCase(), "black")) {
+            GameData modifiedGameData = new GameData(gameData.gameID(), null, userData.username(),
+                    gameData.gameName(), gameData.game());
+            gameDAO.updateGame(modifiedGameData);
         } else {
-            throw new DataAccessException(500, "ITS NOT WHITE");
+            throw new DataAccessException(400, "bad request. please enter a valid color, eg. black or white.");
         }
+
 
 
     }
