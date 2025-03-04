@@ -25,7 +25,7 @@ public class ListGamesHandler implements Route {
 
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
-        ListGamesResult listGamesResult = gameService.getAll();
+        ListGamesResult listGamesResult = gameService.getAll(req.headers("authorization"));
         return new Gson().toJson(listGamesResult);
     }
 }

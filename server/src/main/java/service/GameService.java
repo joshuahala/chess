@@ -40,7 +40,10 @@ public class GameService {
         return createGameResult;
     }
 
-    public ListGamesResult getAll() throws DataAccessException {
+    public ListGamesResult getAll(String authToken) throws DataAccessException {
+        if (authDAO.getAuth(authToken) == null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
         Collection<GameData> gamesList = gameDAO.getAll();
         Collection<GameDataWithoutGames> modifiedGamesList = gamesList.stream()
                 .map(gameData -> new GameDataWithoutGames(gameData.gameID(), gameData.whiteUsername(),
@@ -74,11 +77,17 @@ public class GameService {
         }
 
         if (Objects.equals(joinRequest.playerColor().toLowerCase(), "white")) {
-            GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), null,
+            if (gameData.whiteUsername() != null) {
+                throw new DataAccessException(403, "Forbidden");
+            }
+            GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), gameData.blackUsername(),
                     gameData.gameName(), gameData.game());
             gameDAO.updateGame(modifiedGameData);
         } else if (Objects.equals(joinRequest.playerColor().toLowerCase(), "black")) {
-            GameData modifiedGameData = new GameData(gameData.gameID(), null, userData.username(),
+            if (gameData.blackUsername() != null) {
+                throw new DataAccessException(403, "Forbidden");
+            }
+            GameData modifiedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), userData.username(),
                     gameData.gameName(), gameData.game());
             gameDAO.updateGame(modifiedGameData);
         } else {

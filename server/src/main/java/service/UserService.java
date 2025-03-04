@@ -52,7 +52,7 @@ public class UserService {
         UserData userData = userDAO.getUser(loginRequest.username());
         // If null, throw error
         if (userData == null) {
-            throw new DataAccessException(404, "This person doesn't exist");
+            throw new DataAccessException(401, "This person doesn't exist");
         }
 
         // check password

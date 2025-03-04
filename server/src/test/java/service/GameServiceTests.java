@@ -65,9 +65,10 @@ public class GameServiceTests {
         Collection<GameDataWithoutGames> expectedGames = new ArrayList<>();
         expectedGames.add(new GameDataWithoutGames(1235, null, null, "myGame"));
         ListGamesResult expectedResult = new ListGamesResult(expectedGames);
+        // use authToken
 
         // list games
-        ListGamesResult listGamesResult = gameService.getAll();
+        ListGamesResult listGamesResult = gameService.getAll(authToken);
         Assertions.assertEquals(expectedResult,listGamesResult, "not the same list of games!");
     }
 }
