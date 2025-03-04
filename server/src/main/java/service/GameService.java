@@ -21,6 +21,10 @@ public class GameService {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
+        //check for null
+        if (createGameRequest.gameName() == null) {
+            throw new DataAccessException(400, "bad request");
+        }
         // check authentication
         String authToken = createGameRequest.authToken();
         // get authData

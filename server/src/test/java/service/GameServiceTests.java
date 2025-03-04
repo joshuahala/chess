@@ -6,32 +6,41 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.*;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class GameServiceTests {
-    @Test
-    @DisplayName("TestCreateGame")
-    public void testCreateGame() throws DataAccessException {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-        UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+    MemoryUserDAO userDAO = new MemoryUserDAO();
+    MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    MemoryGameDAO gameDAO = new MemoryGameDAO();
+    UserService userService = new UserService(userDAO, authDAO);
+    GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+
+    UserData userData;
+    String authToken;
+
+    RegisterResult registerResult;
+
+    @BeforeEach
+    public void init() throws DataAccessException {
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
-        var userData = new Gson().fromJson(jsonInput, UserData.class);
+        userData = new Gson().fromJson(jsonInput, UserData.class);
 
         // register user
-        RegisterResult registerResult = userService.register(userData);
+        registerResult = userService.register(userData);
         // login
         LoginRequest loginRequest = new LoginRequest("Jeremy", "secret");
         LoginResult loginResult = userService.login(loginRequest);
-        String authToken = loginResult.authToken();
+        authToken = loginResult.authToken();
+    }
+    @Test
+    @DisplayName("TestCreateGame")
+    public void testCreateGame() throws DataAccessException {
+
+
 
         // create Game
         CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest(authToken, "myGame"));
@@ -39,24 +48,26 @@ public class GameServiceTests {
     }
 
     @Test
+    @DisplayName("Create with bad values")
+    public void createGameBadValues() throws DataAccessException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest(authToken, null));
+        });
+
+    }
+
+    @Test
+    @DisplayName("List Games with bad auth")
+    public void listGamesBadAuth() throws DataAccessException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest("badToken", "gameName"));
+        });
+
+    }
+
+    @Test
     @DisplayName("ListGames")
     public void listGamesTest() throws DataAccessException {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-        UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
-
-
-        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
-        var userData = new Gson().fromJson(jsonInput, UserData.class);
-
-        // register user
-        RegisterResult registerResult = userService.register(userData);
-        // login
-        LoginRequest loginRequest = new LoginRequest("Jeremy", "secret");
-        LoginResult loginResult = userService.login(loginRequest);
-        String authToken = loginResult.authToken();
 
         // create Game
         CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest(authToken, "myGame"));
@@ -70,5 +81,42 @@ public class GameServiceTests {
         // list games
         ListGamesResult listGamesResult = gameService.getAll(authToken);
         Assertions.assertEquals(expectedResult,listGamesResult, "not the same list of games!");
+    }
+
+    @Test
+    @DisplayName("Join Game with bad ID")
+    public void joinGameBadID() throws DataAccessException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+        gameService.joinGame(new JoinGameRequest("white", "0000"), authToken);
+        });
+    }
+
+    @Test
+    @DisplayName("Join Game")
+    public void joinGame() throws DataAccessException {
+        // create Game
+        CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest(authToken, "myGame"));
+        // join game
+        gameService.joinGame(new JoinGameRequest("white", "1235"), authToken);
+        // check if User joined game
+        GameData gameData = gameService.gameDAO.getGame(1235);
+        Assertions.assertEquals(userData.username(), gameData.whiteUsername());
+
+    }
+
+    @Test
+    @DisplayName("Delete All Games")
+    public void deleteAllGames() throws DataAccessException {
+        // create Game
+        CreateGameResult createGameResult = gameService.createGame(new CreateGameRequest(authToken, "myGame"));
+        // check if game is there
+        Assertions.assertNotNull(gameService.getAll(authToken));
+        // delete games
+        gameService.deleteAllGames();
+        // check for games
+        Collection<GameDataWithoutGames> games = new ArrayList<>();
+        ListGamesResult listGamesResult = gameService.getAll(authToken);
+        ArrayList<GameDataWithoutGames> expected = new ArrayList<>();
+        Assertions.assertEquals(expected, listGamesResult.games());
     }
 }

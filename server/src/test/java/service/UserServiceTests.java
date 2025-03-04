@@ -118,6 +118,23 @@ public class UserServiceTests {
     }
 
     @Test
+    @DisplayName("Login with wrong password")
+    public void loginBadPassword() throws DataAccessException {
+        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+        String expectedName = "Jeremy";
+
+        // register user
+        RegisterResult registerResult = service.register(userData);
+        // login
+            LoginRequest loginRequest = new LoginRequest("Jeremy", "wrongPassword");
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            service.login(loginRequest);
+        });
+
+    }
+
+    @Test
     public void logoutUser() throws DataAccessException {
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         var userData = new Gson().fromJson(jsonInput, UserData.class);
@@ -135,5 +152,47 @@ public class UserServiceTests {
         AuthData authData = service.authDAO.getAuth(loginResult.authToken());
         System.out.println(authData);
         Assertions.assertTrue(authData == null, "Error: authdata was expected to be deleted, but it was found");
+    }
+
+    @Test
+    public void logoutNonExistentUser() throws DataAccessException {
+        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+
+        // register user
+        RegisterResult registerResult = service.register(userData);
+        // login
+        LoginRequest loginRequest = new LoginRequest("Jeremy", "secret");
+        LoginResult loginResult = service.login(loginRequest);
+        // logout
+        LogoutRequest logoutRequest = new LogoutRequest("oldAuthToken");
+        // assert throws error
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            LogoutResult logoutResult = service.logout(logoutRequest);
+        });
+    }
+
+    @Test
+    @DisplayName("Clear authData and Userdata")
+    public void clearData() throws DataAccessException {
+        String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
+        var userData = new Gson().fromJson(jsonInput, UserData.class);
+        String expectedName = "Jeremy";
+
+        // register user
+        RegisterResult registerResult = service.register(userData);
+        // login
+        LoginRequest loginRequest = new LoginRequest("Jeremy", "secret");
+        LoginResult loginResult = service.login(loginRequest);
+
+        String resultName = loginResult.username();
+        String resultToken = loginResult.authToken();
+
+        // clear
+        service.deleteAllUsers();
+        service.deleteAllAuthData();
+        // assert data is cleared
+        Assertions.assertNull(userDAO.getUser("Jeremy"));
+        Assertions.assertNull(authDAO.getAuth(loginResult.authToken()));
     }
 }
