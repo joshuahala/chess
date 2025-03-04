@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import model.*;
 import service.GameService;
 import service.UserService;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 public class CreateGameHandler implements Route {
     GameService gameService;
-    public CreateGameHandler (MemoryGameDAO gameDAO, MemoryAuthDAO authDAO) {
-        this.gameService = new GameService(gameDAO, authDAO);
+    public CreateGameHandler (MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+        this.gameService = new GameService(userDAO, authDAO, gameDAO);
     }
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
