@@ -1,6 +1,8 @@
 package service;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
 import model.*;
 import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.*;
@@ -11,10 +13,20 @@ import spark.utils.Assert;
 import java.util.Locale;
 
 public class UserServiceTests {
+    private UserService service;
+    private MemoryUserDAO userDAO;
+    private MemoryAuthDAO authDAO;
+
+    @BeforeEach
+    public void setup() {
+        userDAO = new MemoryUserDAO();
+        authDAO = new MemoryAuthDAO();
+        service = new UserService(userDAO, authDAO);
+    }
+
     @Test
     @DisplayName("Register User")
     public void registerNewUser() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         String expectedName = "Jeremy";
 
@@ -31,16 +43,12 @@ public class UserServiceTests {
     @Test
     @DisplayName("Try to register user twice")
     public void registerUserTwiceGivesError() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         String expectedName = "Jeremy";
-
         var userData = new Gson().fromJson(jsonInput, UserData.class);
-        RegisterResult registerResult = service.register(userData);
-
+        service.register(userData);
         Assertions.assertThrows(DataAccessException.class, () -> {
             service.register(userData);
-
         });
     }
 
@@ -53,7 +61,6 @@ public class UserServiceTests {
     })
     public void emptyRegisterStringThrowsError(String username, String password, String email) {
         // Arrange: Set up the UserService and the input JSON
-        UserService service = new UserService();
         String jsonInput = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}", username, password, email);
 
         var userData = new Gson().fromJson(jsonInput, UserData.class);
@@ -64,11 +71,9 @@ public class UserServiceTests {
         });
     }
 
-
     @Test
     @DisplayName("Get User Info")
     public void getUserInfo() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
 
         var userData = new Gson().fromJson(jsonInput, UserData.class);
@@ -78,12 +83,10 @@ public class UserServiceTests {
 
         Assertions.assertEquals(expectedUser, retrievedUser,
                 "This is not the user you are looking for");
-
     }
 
     @Test
     public void getUserOnEmptyDataBaseReturnsError() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
 
         var userData = new Gson().fromJson(jsonInput, UserData.class);
@@ -96,7 +99,6 @@ public class UserServiceTests {
 
     @Test
     public void loginUser() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         var userData = new Gson().fromJson(jsonInput, UserData.class);
         String expectedName = "Jeremy";
@@ -117,7 +119,6 @@ public class UserServiceTests {
 
     @Test
     public void logoutUser() throws DataAccessException {
-        UserService service = new UserService();
         String jsonInput = "{\"username\":\"Jeremy\",\"password\":\"secret\",\"email\":\"jeremy@gmail.com\"}";
         var userData = new Gson().fromJson(jsonInput, UserData.class);
         String expectedName = "Jeremy";
