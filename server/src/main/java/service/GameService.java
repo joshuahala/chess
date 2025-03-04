@@ -50,6 +50,10 @@ public class GameService {
         return new ListGamesResult(modifiedGamesList);
     }
 
+    public void deleteAllGames() throws DataAccessException {
+        gameDAO.deleteAllGames();
+    }
+
     private int newID() {
         latestID ++;
         return latestID;

@@ -20,5 +20,9 @@ public class MemoryGameDAO implements GameDAO{
         return this.gameList.values();
     }
 
+    public void deleteAllGames() throws DataAccessException {
+        this.gameList = new HashMap<>();
+    }
+
 
 }

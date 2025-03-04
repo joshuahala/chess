@@ -23,7 +23,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.exception(DataAccessException.class, this::errorHandler);
         Spark.post("/user", new RegisterHandler(userDAO, authDAO));
-        Spark.delete("/db", new ClearHandler(userDAO, authDAO));
+        Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
         Spark.post("/session", new LoginHandler(userDAO, authDAO));
         Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
         Spark.post("/game", new CreateGameHandler(gameDAO, authDAO));
