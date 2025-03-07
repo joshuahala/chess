@@ -25,8 +25,21 @@ public class SqlUserDAO implements UserDAO {
         return new UserData(userData.username(), userData.password(), userData.email());
     }
     @Override
-    public UserData getUser(String username) {
-        return new UserData("","","");
+    public UserData getUser(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, json FROM users WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUserData(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
     }
 
     @Override
@@ -93,6 +106,13 @@ public class SqlUserDAO implements UserDAO {
 //        return pet.setId(id);
 //    }
 //
+    private UserData readUserData(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var password = rs.getString("password");
+        var email = rs.getString("email");
+        var userData = new UserData(username, password, email);
+        return userData;
+    }
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
