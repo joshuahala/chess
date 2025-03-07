@@ -1,9 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.JoinGameResult;
 import model.LoginRequest;
 import model.LoginResult;
@@ -15,7 +13,7 @@ import spark.Route;
 
 public class LoginHandler implements Route {
     UserService userService;
-    public LoginHandler (MemoryUserDAO userDAO, MemoryAuthDAO authDAO) {
+    public LoginHandler (UserDAO userDAO, AuthDAO authDAO) {
         this.userService = new UserService(userDAO, authDAO);
     }
     @Override
