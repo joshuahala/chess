@@ -1,7 +1,5 @@
 package service;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.util.log.Log;
 
@@ -10,10 +8,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    public MemoryUserDAO userDAO;
-    public MemoryAuthDAO authDAO;
+//    public MemoryUserDAO userDAO;
+//    public MemoryAuthDAO authDAO;
+    public UserDAO userDAO;
+    public AuthDAO authDAO;
 
-    public UserService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO) {
+
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
@@ -31,9 +32,9 @@ public class UserService {
             throw new DataAccessException(400, "bad request");
         }
         //check if user exists
-        if (userDAO.getUser(userData.username()) != null) {
-            throw new DataAccessException(403,"This user already exists");
-        }
+//        if (userDAO.getUser(userData.username()) != null) {
+//            throw new DataAccessException(403,"This user already exists");
+//        }
         //if not, then create user data
         //add userdata
         userDAO.createUser(userData);
@@ -83,11 +84,11 @@ public class UserService {
 
     }
 
-    public void deleteAllUsers() {
+    public void deleteAllUsers() throws DataAccessException {
         userDAO.deleteAllUsers();
     }
 
-    public void deleteAllAuthData() {
+    public void deleteAllAuthData() throws DataAccessException {
         authDAO.deleteAllAuthData();
     }
 }

@@ -24,8 +24,8 @@ public class ClearHandler implements Route {
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
-        userService.deleteAllUsers();
-        userService.deleteAllAuthData();
+//        userService.deleteAllUsers();
+//        userService.deleteAllAuthData();
         gameService.deleteAllGames();
         return new Gson().toJson(new JoinGameResult());
     }

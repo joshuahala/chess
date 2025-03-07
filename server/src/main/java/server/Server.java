@@ -10,25 +10,29 @@ import java.util.Map;
 
 public class Server {
 
-    public int run(int desiredPort) {
+    public int run(int desiredPort) throws DataAccessException {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
         //UserService userService = new UserService();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
+        //MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+//        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+
+        // mySQL databases
+        SqlUserDAO userDAO = new SqlUserDAO();
+        SqlAuthDAO authDAO = new SqlAuthDAO();
 
 
         // Register your endpoints and handle exceptions here.
         Spark.exception(DataAccessException.class, this::errorHandler);
         Spark.post("/user", new RegisterHandler(userDAO, authDAO));
-        Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
-        Spark.post("/session", new LoginHandler(userDAO, authDAO));
-        Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
-        Spark.post("/game", new CreateGameHandler(userDAO, authDAO, gameDAO));
-        Spark.get("/game", new ListGamesHandler(userDAO, authDAO, gameDAO));
-        Spark.put("/game", new JoinGameHandler(userDAO, authDAO, gameDAO));
+//        Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
+//        Spark.post("/session", new LoginHandler(userDAO, authDAO));
+//        Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
+//        Spark.post("/game", new CreateGameHandler(userDAO, authDAO, gameDAO));
+//        Spark.get("/game", new ListGamesHandler(userDAO, authDAO, gameDAO));
+//        Spark.put("/game", new JoinGameHandler(userDAO, authDAO, gameDAO));
 
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();

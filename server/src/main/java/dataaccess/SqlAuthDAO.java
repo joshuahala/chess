@@ -1,6 +1,7 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 
 import javax.xml.crypto.Data;
@@ -12,33 +13,32 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 
-public class SqlUserDAO implements UserDAO {
+public class SqlAuthDAO implements AuthDAO {
 
-    public SqlUserDAO() throws DataAccessException {
+    public SqlAuthDAO() throws DataAccessException {
         configureDatabase();
     }
 
-    public UserData createUser(UserData userData) throws DataAccessException {
-        var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
-        var json = new Gson().toJson(userData);
-        var id = executeUpdate(statement, userData.username(), userData.password(), userData.email(), json);
-        return new UserData(userData.username(), userData.password(), userData.email());
-    }
-
-    public UserData getUser(String username) {
-        return new UserData("","","");
+    public void createAuth(String authToken, AuthData authData) throws DataAccessException {
+        var statement = "INSERT INTO auth (username, authToken, json) VALUES (?, ?, ?)";
+        var json = new Gson().toJson(authData);
+        var id = executeUpdate(statement, authData.username(), authToken, json);
     }
 
     @Override
-    public void deleteAllUsers() throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        return new AuthData("","");
+    }
+
+    @Override
+    public void deleteAllAuthData() throws DataAccessException {
         int num = 0;
     }
 
     @Override
-    public void deleteUser(String username) throws DataAccessException {
+    public void deleteAuth(String authtoken) throws DataAccessException {
         int num = 0;
     }
-
 
     //
 //    public Pet getPet(int id) throws ResponseException {
@@ -115,20 +115,19 @@ public class SqlUserDAO implements UserDAO {
             throw new DataAccessException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
-//
+    //
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  users (
+            CREATE TABLE IF NOT EXISTS  auth (
               `id` int NOT NULL AUTO_INCREMENT,
-              `username` varchar(256) UNIQUE NOT NULL,
-              `password` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
+              `authToken` char(36) NOT NULL,
               `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`)
             )
             """
     };
-//
+    //
 //
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
