@@ -17,14 +17,14 @@ public class SqlUserDAO implements UserDAO {
     public SqlUserDAO() throws DataAccessException {
         configureDatabase();
     }
-
+    @Override
     public UserData createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(userData);
         var id = executeUpdate(statement, userData.username(), userData.password(), userData.email(), json);
         return new UserData(userData.username(), userData.password(), userData.email());
     }
-
+    @Override
     public UserData getUser(String username) {
         return new UserData("","","");
     }

@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import javax.xml.crypto.Data;
@@ -13,32 +14,24 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 
-public class SqlAuthDAO implements AuthDAO {
+public class SqlGameDAO implements GameDAO {
 
-    public SqlAuthDAO() throws DataAccessException {
+    public SqlGameDAO() throws DataAccessException {
         configureDatabase();
     }
     @Override
-    public void createAuth(String authToken, AuthData authData) throws DataAccessException {
-        var statement = "INSERT INTO auth (username, authToken, json) VALUES (?, ?, ?)";
-        var json = new Gson().toJson(authData);
-        var id = executeUpdate(statement, authData.username(), authToken, json);
+    public void createGame(String authToken, AuthData authData) throws DataAccessException {
+
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
-        return new AuthData("","");
+    public void updateGame(GameData newGame) throws DataAccessException {
+
     }
 
     @Override
-    public void deleteAllAuthData() throws DataAccessException {
-        var statement = "TRUNCATE TABLE auth";
-        executeUpdate(statement);
-    }
-
-    @Override
-    public void deleteAuth(String authtoken) throws DataAccessException {
-        int num = 0;
+    public GameData getGame() throws DataAccessException {
+        return null;
     }
 
     //
