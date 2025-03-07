@@ -31,7 +31,8 @@ public class SqlUserDAO implements UserDAO {
 
     @Override
     public void deleteAllUsers() throws DataAccessException {
-        int num = 0;
+        var statement = "TRUNCATE TABLE users";
+        executeUpdate(statement);
     }
 
     @Override

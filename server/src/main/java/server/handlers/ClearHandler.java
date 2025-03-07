@@ -1,8 +1,5 @@
 package server.handlers;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.JoinGameResult;
 import service.*;
 import spark.Request;
@@ -11,10 +8,12 @@ import spark.Route;
 import com.google.gson.Gson;
 
 public class ClearHandler implements Route {
-    MemoryUserDAO userDAO;
-    MemoryAuthDAO authDAO;
+//    MemoryUserDAO userDAO;
+//    MemoryAuthDAO authDAO;
     MemoryGameDAO gameDAO;
-    public ClearHandler(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+    UserDAO userDAO;
+    AuthDAO authDAO;
+    public ClearHandler(UserDAO userDAO, AuthDAO authDAO, MemoryGameDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
@@ -22,11 +21,11 @@ public class ClearHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
         UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+        //GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
-//        userService.deleteAllUsers();
-//        userService.deleteAllAuthData();
-        gameService.deleteAllGames();
+        userService.deleteAllUsers();
+        userService.deleteAllAuthData();
+        //gameService.deleteAllGames();
         return new Gson().toJson(new JoinGameResult());
     }
 }

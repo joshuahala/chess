@@ -32,7 +32,8 @@ public class SqlAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAllAuthData() throws DataAccessException {
-        int num = 0;
+        var statement = "TRUNCATE TABLE auth";
+        executeUpdate(statement);
     }
 
     @Override
