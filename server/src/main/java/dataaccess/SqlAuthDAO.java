@@ -27,7 +27,21 @@ public class SqlAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return new AuthData("","");
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, authToken FROM auth WHERE authToken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readAuthData(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+
     }
 
     @Override
@@ -37,8 +51,16 @@ public class SqlAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String authtoken) throws DataAccessException {
-        int num = 0;
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(statement, authToken);
+
+    }
+
+    public AuthData readAuthData(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var authToken = rs.getString("authToken");
+        return new AuthData(authToken, username);
     }
 
     //
