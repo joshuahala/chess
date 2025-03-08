@@ -16,12 +16,13 @@ public class Server {
         Spark.staticFiles.location("web");
         //UserService userService = new UserService();
         //MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+//        MemoryGameDAO gameDAO = new MemoryGameDAO();
 //        MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
         // mySQL databases
         SqlUserDAO userDAO = new SqlUserDAO();
         SqlAuthDAO authDAO = new SqlAuthDAO();
+        SqlGameDAO gameDAO = new SqlGameDAO();
 
 
         // Register your endpoints and handle exceptions here.
@@ -30,7 +31,7 @@ public class Server {
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
         Spark.post("/session", new LoginHandler(userDAO, authDAO));
         Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
-//        Spark.post("/game", new CreateGameHandler(userDAO, authDAO, gameDAO));
+        Spark.post("/game", new CreateGameHandler(userDAO, authDAO, gameDAO));
 //        Spark.get("/game", new ListGamesHandler(userDAO, authDAO, gameDAO));
 //        Spark.put("/game", new JoinGameHandler(userDAO, authDAO, gameDAO));
 

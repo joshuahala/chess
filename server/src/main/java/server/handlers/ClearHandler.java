@@ -10,10 +10,10 @@ import com.google.gson.Gson;
 public class ClearHandler implements Route {
 //    MemoryUserDAO userDAO;
 //    MemoryAuthDAO authDAO;
-    MemoryGameDAO gameDAO;
+    GameDAO gameDAO;
     UserDAO userDAO;
     AuthDAO authDAO;
-    public ClearHandler(UserDAO userDAO, AuthDAO authDAO, MemoryGameDAO gameDAO) {
+    public ClearHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;

@@ -20,17 +20,27 @@ public class SqlGameDAO implements GameDAO {
         configureDatabase();
     }
     @Override
-    public void createGame(String authToken, AuthData authData) throws DataAccessException {
+    public void createGame(int gameID, GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO games (id, whiteUsername, blackUsername, gameName, game)" +
+                " VALUES (?, ?, ?, ?, ?)";
+        var gameJson = new Gson().toJson(gameData.game());
+        executeUpdate(statement, gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameJson);
 
     }
 
     @Override
     public void updateGame(GameData newGame) throws DataAccessException {
+        int num = 0;
 
     }
 
     @Override
-    public GameData getGame() throws DataAccessException {
+    public GameData getGame(int gameID) throws DataAccessException {
+        return null;
+    }
+
+    @Override
+    public Collection<GameData> getAll() throws DataAccessException {
         return null;
     }
 
@@ -112,10 +122,12 @@ public class SqlGameDAO implements GameDAO {
     //
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  auth (
+            CREATE TABLE IF NOT EXISTS  games (
               `id` int NOT NULL AUTO_INCREMENT,
-              `username` varchar(256) NOT NULL,
-              `authToken` char(36) NOT NULL,
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
+              `gameName` varchar(256) NOT NULL,
+              `game` TEXT DEFAULT NULL,
               `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`)
             )

@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 public class GameService {
 
-    public MemoryGameDAO gameDAO = new MemoryGameDAO();
-    public MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    public MemoryUserDAO userDAO = new MemoryUserDAO();
+    public GameDAO gameDAO;
+    public AuthDAO authDAO;
+    public UserDAO userDAO;
     private int latestID = 1234;
-    public GameService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO){
+    public GameService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
@@ -102,9 +102,9 @@ public class GameService {
 
     }
 
-    public void deleteAllGames() throws DataAccessException {
-        gameDAO.deleteAllGames();
-    }
+//    public void deleteAllGames() throws DataAccessException {
+//        gameDAO.deleteAllGames();
+//    }
 
     private int newID() {
         latestID ++;
