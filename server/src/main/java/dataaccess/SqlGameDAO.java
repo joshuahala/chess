@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -36,6 +37,19 @@ public class SqlGameDAO implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readGameData(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 
@@ -95,12 +109,15 @@ public class SqlGameDAO implements GameDAO {
 //        executeUpdate(statement);
 //    }
 //
-//    private Pet readPet(ResultSet rs) throws SQLException {
-//        var id = rs.getInt("id");
-//        var json = rs.getString("json");
-//        var pet = new Gson().fromJson(json, Pet.class);
-//        return pet.setId(id);
-//    }
+    private GameData readGameData(ResultSet rs) throws SQLException {
+        var id = rs.getInt("id");
+        var whiteUsername = rs.getString("whiteUsername");
+        var blackUsername = rs.getString("blackUsername");
+        var gameName = rs.getString("gameName");
+        var gameJson = rs.getString("game");
+        ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+        return new GameData(id, whiteUsername, blackUsername, gameName, game);
+    }
 //
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {

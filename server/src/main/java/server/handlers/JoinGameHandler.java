@@ -1,10 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.*;
 import service.GameService;
 import service.UserService;
@@ -16,7 +13,7 @@ import java.util.Collection;
 
 public class JoinGameHandler implements Route {
     GameService gameService;
-    public JoinGameHandler(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
+    public JoinGameHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.gameService = new GameService(userDAO, authDAO, gameDAO);
     }
 
