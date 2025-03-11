@@ -44,6 +44,12 @@ public class SqlGameDAO implements GameDAO {
         return null;
     }
 
+    @Override
+    public void deleteAll() throws DataAccessException {
+        var statement = "TRUNCATE TABLE games";
+        executeUpdate(statement);
+    }
+
     //
 //    public Pet getPet(int id) throws ResponseException {
 //        try (var conn = DatabaseManager.getConnection()) {

@@ -29,7 +29,7 @@ public class MemoryGameDAO implements GameDAO{
         this.gameList.put(newGameData.gameID(), newGameData);
     }
 
-    public void deleteAllGames() throws DataAccessException {
+    public void deleteAll() throws DataAccessException {
         this.gameList = new HashMap<>();
     }
 

@@ -21,11 +21,11 @@ public class ClearHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws DataAccessException {
         UserService userService = new UserService(userDAO, authDAO);
-        //GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+        GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
         userService.deleteAllUsers();
         userService.deleteAllAuthData();
-        //gameService.deleteAllGames();
+        gameService.deleteAllGames();
         return new Gson().toJson(new JoinGameResult());
     }
 }

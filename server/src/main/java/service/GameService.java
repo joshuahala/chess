@@ -102,9 +102,9 @@ public class GameService {
 
     }
 
-//    public void deleteAllGames() throws DataAccessException {
-//        gameDAO.deleteAllGames();
-//    }
+    public void deleteAllGames() throws DataAccessException {
+        gameDAO.deleteAll();
+    }
 
     private int newID() {
         latestID ++;
