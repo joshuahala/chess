@@ -55,7 +55,22 @@ public class SqlGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> getAll() throws DataAccessException {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            Collection<GameData> games = new ArrayList<>();
+            var statement = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        var game = readGameData(rs);
+                        games.add(game);
+
+                    }
+                    return games;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
     }
 
     @Override
