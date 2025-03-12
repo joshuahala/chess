@@ -2,6 +2,7 @@ package service;
 import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.util.log.Log;
+import org.mindrot.jbcrypt.BCrypt;
 
 
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class UserService {
     }
     public RegisterResult register(UserData userData) throws DataAccessException {
         // ensure strings are not empty
-        if (Objects.equals(userData.username(), "") || Objects.equals(userData.password(), "") || Objects.equals(userData.email(), "")) {
+        if (Objects.equals(userData.username(), "") || Objects.equals(newHashPassword(userData.password()), "") || Objects.equals(userData.email(), "")) {
             throw new DataAccessException(400, "bad request");
         }
         if (userData.username() == null || userData.password() == null || userData.email() == null) {
@@ -37,7 +38,8 @@ public class UserService {
 //        }
         //if not, then create user data
         //add userdata
-        userDAO.createUser(userData);
+        UserData newUser = new UserData(userData.username(), newHashPassword(userData.password()), userData.email());
+        userDAO.createUser(newUser);
         //create authData
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
@@ -58,8 +60,9 @@ public class UserService {
 
         // check password
         // if wrong password, send error response
-        if (!Objects.equals(loginRequest.password(), userData.password())) {
-            throw new DataAccessException(401, "Unauthorized");
+        if (!BCrypt.checkpw(loginRequest.password(), userData.password())) {
+
+            throw new DataAccessException(401, String.format("expected: %s, given: %s",newHashPassword(userData.password()), newHashPassword(loginRequest.password())));
         }
         // check if user already logged in
 
@@ -91,4 +94,10 @@ public class UserService {
     public void deleteAllAuthData() throws DataAccessException {
         authDAO.deleteAllAuthData();
     }
+
+    private String newHashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
 }
