@@ -31,7 +31,9 @@ public class SqlGameDAO implements GameDAO {
 
     @Override
     public void updateGame(GameData newGame) throws DataAccessException {
-        int num = 0;
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, game=? WHERE id=?";
+        var jsonGame = new Gson().toJson(newGame.game());
+        executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), jsonGame, newGame.gameID());
 
     }
 
