@@ -48,10 +48,7 @@ public class SqlUserDAO implements UserDAO {
         executeUpdate(statement);
     }
 
-    @Override
-    public void deleteUser(String username) throws DataAccessException {
-        int num = 0;
-    }
+
 
 
     //

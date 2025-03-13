@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Server {
 
-    public int run(int desiredPort) throws DataAccessException {
+    public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
@@ -20,9 +20,16 @@ public class Server {
 //        MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
         // mySQL databases
-        SqlUserDAO userDAO = new SqlUserDAO();
-        SqlAuthDAO authDAO = new SqlAuthDAO();
-        SqlGameDAO gameDAO = new SqlGameDAO();
+        SqlUserDAO userDAO = null;
+        SqlAuthDAO authDAO = null;
+        SqlGameDAO gameDAO = null;
+        try {
+            userDAO = new SqlUserDAO();
+            authDAO = new SqlAuthDAO();
+            gameDAO = new SqlGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
 
         // Register your endpoints and handle exceptions here.
