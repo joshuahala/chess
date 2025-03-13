@@ -91,8 +91,22 @@ public class SqlUserDAOTests {
     }
 
     // deleteAll test
-    // call deleteAll()
-    // assert db is empty
+    @Test
+    @DisplayName("delete All Test")
+    void deleteAllTest() throws DataAccessException {
+        // create user and populate database
+        UserData newUser = new UserData("jon", "pass", "jb@gmail");
+        userDAO.createUser(newUser);
+
+        // clear database
+        userDAO.deleteAllUsers();
+
+        // assert database is empty
+        Assertions.assertThrows(DataAccessException.class, ()-> {
+            userDAO.getUser("jon");
+        });
+    }
+
 
     private boolean checkForUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
