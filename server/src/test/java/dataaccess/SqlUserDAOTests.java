@@ -24,7 +24,8 @@ public class SqlUserDAOTests {
     private static SqlGameDAO gameDAO = null;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws DataAccessException {
+        clearDB();
 
         try {
             userDAO = new SqlUserDAO();
@@ -39,22 +40,43 @@ public class SqlUserDAOTests {
     @Test
     @DisplayName("Register New User Test")
     public void registerUserTest() throws DataAccessException {
-    // create connection to db
-    // register user
-     UserData newUser = new UserData("jon", "pass", "jb@gmail");
-     userDAO.createUser(newUser);
+        // create connection to db
+        // register user
+        UserData newUser = new UserData("jon", "pass", "jb@gmail");
+        userDAO.createUser(newUser);
 
-    // check if user is in db
-    Assertions.assertTrue(checkForUser(newUser.username()));
+        // check if user is in db
+        Assertions.assertTrue(checkForUser(newUser.username()));
     }
 
     // create user negative test
-    // create user with empty email
-    // assert error is thrown
+    @Test
+    @DisplayName("Register user twice throws error")
+    public void registerUserTwice() throws DataAccessException {
+        // create user with empty email
+        UserData newUser = new UserData("jon", "pass", "jb@gmail");
+        userDAO.createUser(newUser);
+        // assert error is thrown
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            userDAO.createUser(newUser);
+        });
+    }
 
     // get user positive test
-    // userDAO.getUser()
-    // assert is the same as the expected
+    @Test
+    @DisplayName("getUserTest")
+    public void getUserTest() throws DataAccessException {
+        // create user
+        UserData newUser = new UserData("jon", "pass", "jb@gmail");
+        userDAO.createUser(newUser);
+        // userDAO.getUser()
+        UserData fetchedUser = userDAO.getUser("jon");
+
+        Assertions.assertEquals(newUser, fetchedUser);
+
+        // assert is the same as the expected
+    }
+
 
     // get user negative test
     // fetching a non-existent user throws an error
@@ -69,17 +91,34 @@ public class SqlUserDAOTests {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
-                    if (Objects.equals(rs.getString("username"), username)){
-                        return true;
-                    } else {
-                        return false;
+                    if (rs.next()) {
+                        if (rs.getString("username") != null) {
+                            return Objects.equals(rs.getString("username"), username);
+                        }
                     }
+
                 }
             }
         } catch (Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
+        return false;
 
+    }
+
+    private static void clearDB() throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String[] tables = {"users", "auth", "games"};
+
+            for (String table : tables) {
+                var statement = "TRUNCATE TABLE " + table;
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(500, String.format("Unable to clear data: %s", e.getMessage()));
+        }
     }
 }
 
