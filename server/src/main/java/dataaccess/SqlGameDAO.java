@@ -31,9 +31,13 @@ public class SqlGameDAO implements GameDAO {
 
     @Override
     public void updateGame(GameData newGame) throws DataAccessException {
+        if (getGame(newGame.gameID()) == null) {
+            throw new DataAccessException(400, "Bad Request");
+        }
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, game=? WHERE id=?";
         var jsonGame = new Gson().toJson(newGame.game());
-        executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), jsonGame, newGame.gameID());
+        var id = executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), jsonGame, newGame.gameID());
+
 
     }
 
@@ -46,13 +50,14 @@ public class SqlGameDAO implements GameDAO {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readGameData(rs);
+                    } else {
+                        throw new DataAccessException(400, "Bad Request");
                     }
                 }
             }
         } catch (Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
     }
 
     @Override
@@ -150,7 +155,9 @@ public class SqlGameDAO implements GameDAO {
 
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    if (rs.getInt(1) > 0) {
+                        return rs.getInt(1);
+                    }
                 }
 
                 return 0;

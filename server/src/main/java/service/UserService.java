@@ -32,9 +32,12 @@ public class UserService {
         if (userData.username() == null || userData.password() == null || userData.email() == null) {
             throw new DataAccessException(400, "bad request");
         }
-        //check if user exists
-//        if (userDAO.getUser(userData.username()) != null) {
+//        check if user exists
+//        try {
+//            userDAO.getUser(userData.username());
+//        } catch (Exception e) {
 //            throw new DataAccessException(403,"This user already exists");
+//
 //        }
         //if not, then create user data
         //add userdata

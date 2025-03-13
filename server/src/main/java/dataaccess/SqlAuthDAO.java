@@ -8,6 +8,7 @@ import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.sql.*;
+import java.util.Objects;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -20,6 +21,9 @@ public class SqlAuthDAO implements AuthDAO {
     }
     @Override
     public void createAuth(String authToken, AuthData authData) throws DataAccessException {
+        if(Objects.equals(authToken, "") || authToken == null) {
+            throw new DataAccessException(400, "Bad request");
+        }
         var statement = "INSERT INTO auth (username, authToken, json) VALUES (?, ?, ?)";
         var json = new Gson().toJson(authData);
         var id = executeUpdate(statement, authData.username(), authToken, json);
@@ -34,13 +38,14 @@ public class SqlAuthDAO implements AuthDAO {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readAuthData(rs);
+                    } else {
+                        return null;
                     }
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+            return null;
         }
-        return null;
 
     }
 
@@ -52,6 +57,9 @@ public class SqlAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        if (getAuth(authToken) == null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
         var statement = "DELETE FROM auth WHERE authToken=?";
         executeUpdate(statement, authToken);
 

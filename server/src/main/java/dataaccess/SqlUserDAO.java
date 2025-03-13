@@ -19,6 +19,9 @@ public class SqlUserDAO implements UserDAO {
     }
     @Override
     public UserData createUser(UserData userData) throws DataAccessException {
+        if (getUser(userData.username()) != null) {
+            throw new DataAccessException(403, "Error: already taken");
+        }
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(userData);
         var id = executeUpdate(statement, userData.username(), userData.password(), userData.email(), json);
@@ -34,12 +37,12 @@ public class SqlUserDAO implements UserDAO {
                     if (rs.next()) {
                         return readUserData(rs);
                     } else {
-                        throw new DataAccessException(400, "Bad request");
+                        return null;
                     }
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
+            return null;
         }
     }
 

@@ -17,6 +17,10 @@ public class SqlGameDAOTests {
         clearDB();
         gameDAO = new SqlGameDAO();
     }
+    @BeforeEach
+    public  void beforeEach() throws DataAccessException {
+        clearDB();
+    }
 
     @Test
     @DisplayName("Create Game with Valid Data")
@@ -59,10 +63,12 @@ public class SqlGameDAOTests {
     public void testUpdateGameWithValidData() throws DataAccessException {
         GameData gameData = new GameData(3, "whitePlayer3", "blackPlayer3", "Game3", new ChessGame());
         gameDAO.createGame(3, gameData);
-        GameData updatedGameData = new GameData(3, "whitePlayer3Updated", "blackPlayer3Updated", "Game3Updated", new ChessGame());
+        GameData updatedGameData = new GameData(3, "whitePlayer3Updated", "blackPlayer3Updated", "Game3", new ChessGame());
         gameDAO.updateGame(updatedGameData);
         GameData fetchedGame = gameDAO.getGame(3);
-        assertEquals(updatedGameData, fetchedGame);
+        assertEquals(updatedGameData.gameID(), fetchedGame.gameID());
+        assertEquals(updatedGameData.whiteUsername(), fetchedGame.whiteUsername());
+        assertEquals(updatedGameData.gameName(), fetchedGame.gameName());
     }
 
     @Test

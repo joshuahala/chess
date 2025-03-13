@@ -25,7 +25,7 @@ public class SqlUserDAOTests {
 
     @BeforeAll
     public static void init() throws DataAccessException {
-        clearDB();
+
 
         try {
             userDAO = new SqlUserDAO();
@@ -34,6 +34,15 @@ public class SqlUserDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @BeforeEach
+    public  void beforeEach() throws DataAccessException {
+        clearDB();
+    }
+    @AfterEach
+    public void afterEach() throws DataAccessException {
+        clearDB();
     }
 
     // create user positive test
