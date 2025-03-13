@@ -7,6 +7,8 @@ import dataaccess.MemoryUserDAO;
 import model.*;
 import org.junit.jupiter.api.*;
 import dataaccess.*;
+import service.UserService;
+
 import java.sql.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -19,9 +21,9 @@ import java.util.Objects;
 
 public class SqlUserDAOTests {
 
-    private static SqlUserDAO userDAO;
-    private static SqlAuthDAO authDAO = null;
-    private static SqlGameDAO gameDAO = null;
+    private static UserDAO userDAO;
+    private static AuthDAO authDAO = null;
+    private static GameDAO gameDAO = null;
 
     @BeforeAll
     public static void init() throws DataAccessException {
@@ -93,9 +95,7 @@ public class SqlUserDAOTests {
     public void getNonExistentUser() throws DataAccessException {
         // fetching a non-existent user throws an error
 
-        Assertions.assertThrows(DataAccessException.class, ()-> {
-            UserData fetchedUser = userDAO.getUser("nobody");
-        });
+        Assertions.assertNull(userDAO.getUser("nonexistent"));
 
     }
 
@@ -111,9 +111,7 @@ public class SqlUserDAOTests {
         userDAO.deleteAllUsers();
 
         // assert database is empty
-        Assertions.assertThrows(DataAccessException.class, ()-> {
-            userDAO.getUser("jon");
-        });
+        Assertions.assertNull(userDAO.getUser("jon"));
     }
 
 

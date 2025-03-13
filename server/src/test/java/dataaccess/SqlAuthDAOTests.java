@@ -45,7 +45,7 @@ public class SqlAuthDAOTests {
     @Test
     @DisplayName("Get Auth Negative Test")
     public void getAuthNegativeTest() throws DataAccessException {
-        assertThrows(DataAccessException.class, () -> authDAO.getAuth("nonexistentToken"));
+        Assertions.assertNull(authDAO.getAuth("nonexistentToken"));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class SqlAuthDAOTests {
         AuthData authData = new AuthData("token789", "user3");
         authDAO.createAuth("token789", authData);
         authDAO.deleteAuth("token789");
-        assertThrows(DataAccessException.class, () -> authDAO.getAuth("token789"));
+        Assertions.assertNull(authDAO.getAuth("token789"));
     }
     
 
@@ -66,8 +66,8 @@ public class SqlAuthDAOTests {
         authDAO.createAuth("token101", authData1);
         authDAO.createAuth("token102", authData2);
         authDAO.deleteAllAuthData();
-        assertThrows(DataAccessException.class, () -> authDAO.getAuth("token101"));
-        assertThrows(DataAccessException.class, () -> authDAO.getAuth("token102"));
+        Assertions.assertNull(authDAO.getAuth("token101"));
+        Assertions.assertNull(authDAO.getAuth("token102"));
     }
 
     private static void clearDB() throws DataAccessException {
