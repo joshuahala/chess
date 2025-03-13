@@ -33,13 +33,14 @@ public class SqlUserDAO implements UserDAO {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readUserData(rs);
+                    } else {
+                        throw new DataAccessException(400, "Bad request");
                     }
                 }
             }
         } catch (Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
     }
 
     @Override

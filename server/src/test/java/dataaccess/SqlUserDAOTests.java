@@ -64,7 +64,7 @@ public class SqlUserDAOTests {
 
     // get user positive test
     @Test
-    @DisplayName("getUserTest")
+    @DisplayName("get User Test")
     public void getUserTest() throws DataAccessException {
         // create user
         UserData newUser = new UserData("jon", "pass", "jb@gmail");
@@ -72,14 +72,23 @@ public class SqlUserDAOTests {
         // userDAO.getUser()
         UserData fetchedUser = userDAO.getUser("jon");
 
+        // assert is the same as the expected
         Assertions.assertEquals(newUser, fetchedUser);
 
-        // assert is the same as the expected
     }
 
 
     // get user negative test
-    // fetching a non-existent user throws an error
+    @Test
+    @DisplayName("Get non-existent user throws error")
+    public void getNonExistentUser() throws DataAccessException {
+        // fetching a non-existent user throws an error
+
+        Assertions.assertThrows(DataAccessException.class, ()-> {
+            UserData fetchedUser = userDAO.getUser("nobody");
+        });
+
+    }
 
     // deleteAll test
     // call deleteAll()
