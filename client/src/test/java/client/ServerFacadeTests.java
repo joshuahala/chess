@@ -132,6 +132,19 @@ public class ServerFacadeTests {
         Assertions.assertNotNull(result);
     }
 
+    @Test
+    public void JoinGameFailTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
+        CreateGameResult createGameResult = facade.createGame(createGameRequest);
+        var gameID = createGameResult.gameID();
+        // invalid color: purple
+        JoinGameRequest joinGameRequest = new JoinGameRequest("purple", Integer.toString(gameID));
+        Assertions.assertThrows(ResponseException.class, ()->{
+            facade.joinGame(joinGameRequest, loginResult.authToken());
+        });
+    }
+
 //    @Test
 //    void clearTest() throws Exception {
 //        // no email.
