@@ -34,8 +34,16 @@ public class ServerFacadeTests {
     void register() throws Exception {
         UserData userData = new UserData("player1", "password", "p1@email.com");
         var authData = facade.register(userData);
-//        System.out.println("auth data is: " + authData.authToken());
         Assertions.assertTrue(authData.authToken().length() > 10);
+    }
+    @Test
+    void registerFail() throws Exception {
+        // no email.
+        UserData userData = new UserData("player1", "password", "");
+        Assertions.assertThrows(ResponseException.class, ()-> {
+            var authData = facade.register(userData);
+
+        });
     }
 
 }
