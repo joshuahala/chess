@@ -105,6 +105,13 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void ListGamesTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "");
+        Assertions.assertNotNull(facade.listGames(loginResult.authToken()));
+    }
+
 //    @Test
 //    void clearTest() throws Exception {
 //        // no email.

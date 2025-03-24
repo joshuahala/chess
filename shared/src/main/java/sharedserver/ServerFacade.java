@@ -42,6 +42,11 @@ public class ServerFacade {
         var path = "/game";
         return makeRequest("POST", createGameRequest.authToken(), path, createGameRequest, CreateGameResult.class);
     }
+
+    public ListGamesResult listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return makeRequest("GET", authToken, path, null, ListGamesResult.class);
+    }
 //
 //    public void deleteAllPets() throws ResponseException {
 //        var path = "/pet";
