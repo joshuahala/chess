@@ -6,6 +6,8 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import sharedserver.ServerFacade;
 
+import java.util.ArrayList;
+
 
 public class ServerFacadeTests {
 
@@ -145,14 +147,23 @@ public class ServerFacadeTests {
         });
     }
 
-//    @Test
-//    void clearTest() throws Exception {
-//        // no email.
-//        UserData userData = new UserData("player1", "password", "email");
-//        facade.register(userData);
-//        facade.clear();
-//
-//    }
+    @Test
+    void clearTest() throws Exception {
+        // create game, user, and auth data
+        // player1, password, p1@email.com
+        // myGame
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
+        CreateGameResult createGameResult = facade.createGame(createGameRequest);
+        // clear db tables
+        facade.clear();
+
+        // Assert user data doesn't exist
+        Assertions.assertThrows(ResponseException.class, ()->{
+            facade.login(new LoginRequest("username", "password"));
+        });
+
+    }
 
     private LoginResult loginUser() throws Exception {
         UserData userData = new UserData("player1", "password", "p1@email.com");
@@ -161,6 +172,4 @@ public class ServerFacadeTests {
         var loginResult = facade.login(loginRequest);
         return loginResult;
     }
-
-
 }
