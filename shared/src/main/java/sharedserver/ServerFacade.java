@@ -37,6 +37,11 @@ public class ServerFacade {
         var path = "/session";
         return makeRequest("DELETE", logoutRequest.authToken(), path, logoutRequest, LogoutResult.class);
     }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ResponseException {
+        var path = "/game";
+        return makeRequest("POST", createGameRequest.authToken(), path, createGameRequest, CreateGameResult.class);
+    }
 //
 //    public void deleteAllPets() throws ResponseException {
 //        var path = "/pet";

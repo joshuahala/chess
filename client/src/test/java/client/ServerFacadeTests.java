@@ -1,9 +1,7 @@
 package client;
 
 import exception.ResponseException;
-import model.LoginRequest;
-import model.LogoutRequest;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import sharedserver.ServerFacade;
@@ -89,6 +87,24 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void CreateGameTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "GameName");
+        CreateGameResult createGameResult = facade.createGame(createGameRequest);
+        var gameId = createGameResult.gameID();
+        Assertions.assertTrue(gameId > 0);
+    }
+    @Test
+    public void CreateGameFailTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        // no game name given
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "");
+        Assertions.assertThrows(ResponseException.class, ()->{
+            CreateGameResult createGameResult = facade.createGame(createGameRequest);
+        });
+    }
+
 //    @Test
 //    void clearTest() throws Exception {
 //        // no email.
@@ -97,6 +113,14 @@ public class ServerFacadeTests {
 //        facade.clear();
 //
 //    }
+
+    private LoginResult loginUser() throws Exception {
+        UserData userData = new UserData("player1", "password", "p1@email.com");
+        var registerResult = facade.register(userData);
+        LoginRequest loginRequest = new LoginRequest("player1", "password");
+        var loginResult = facade.login(loginRequest);
+        return loginResult;
+    }
 
 
 }
