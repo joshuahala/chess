@@ -1,4 +1,4 @@
 package model;
 
-public class LogoutResult {
+public record LogoutResult (boolean isSuccess){
 }

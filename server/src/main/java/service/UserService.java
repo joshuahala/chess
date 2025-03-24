@@ -86,7 +86,7 @@ public class UserService {
         }
         // if authData, then delete it
         authDAO.deleteAuth(logoutRequest.authToken());
-        return new LogoutResult();
+        return new LogoutResult(true);
 
     }
 

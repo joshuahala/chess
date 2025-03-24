@@ -2,10 +2,7 @@ package sharedserver;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.LoginRequest;
-import model.LoginResult;
-import model.RegisterResult;
-import model.UserData;
+import model.*;
 
 import java.io.*;
 import java.net.*;
@@ -23,17 +20,22 @@ public class ServerFacade {
 
     public RegisterResult register(UserData userData) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, userData, RegisterResult.class);
+        return this.makeRequest("POST", null, path, userData, RegisterResult.class);
     }
 //
     public void clear() throws ResponseException {
         var path = "/db";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", null, path, null, null);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, loginRequest, LoginResult.class);
+        return this.makeRequest("POST", null,  path, loginRequest, LoginResult.class);
+    }
+
+    public LogoutResult logout(LogoutRequest logoutRequest) throws ResponseException {
+        var path = "/session";
+        return makeRequest("DELETE", logoutRequest.authToken(), path, logoutRequest, LogoutResult.class);
     }
 //
 //    public void deleteAllPets() throws ResponseException {
@@ -49,11 +51,14 @@ public class ServerFacade {
 //        return response.pet();
 //    }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String property, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
+            if (property != null) {
+                http.addRequestProperty("Authorization", property);
+            }
             http.setDoOutput(true);
 
             writeBody(request, http);

@@ -2,6 +2,7 @@ package client;
 
 import exception.ResponseException;
 import model.LoginRequest;
+import model.LogoutRequest;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -63,6 +64,16 @@ public class ServerFacadeTests {
         Assertions.assertThrows(ResponseException.class, ()->{
             facade.login(loginRequest);
         });
+    }
+    @Test
+    void logoutTest() throws Exception{
+        UserData userData = new UserData("player1", "password", "p1@email.com");
+        var registerResult = facade.register(userData);
+        LoginRequest loginRequest = new LoginRequest("player1", "password");
+        var loginResult = facade.login(loginRequest);
+        LogoutRequest logoutRequest = new LogoutRequest(loginResult.authToken());
+        var logoutResult = facade.logout(logoutRequest);
+        Assertions.assertTrue(logoutResult.isSuccess());
     }
 
 //    @Test
