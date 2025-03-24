@@ -2,6 +2,8 @@ package sharedserver;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.RegisterResult;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
@@ -15,15 +17,15 @@ public class ServerFacade {
     }
 
 
-//    public Pet addPet(Pet pet) throws ResponseException {
-//        var path = "/pet";
-//        return this.makeRequest("POST", path, pet, Pet.class);
-//    }
+    public RegisterResult register(UserData userData) throws ResponseException {
+        var path = "/user";
+        return this.makeRequest("POST", path, userData, RegisterResult.class);
+    }
 //
-//    public void deletePet(int id) throws ResponseException {
-//        var path = String.format("/pet/%s", id);
-//        this.makeRequest("DELETE", path, null, null);
-//    }
+    public void clear() throws ResponseException {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
 //
 //    public void deleteAllPets() throws ResponseException {
 //        var path = "/pet";
