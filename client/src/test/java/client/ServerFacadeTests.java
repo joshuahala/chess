@@ -121,6 +121,17 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void JoinGameTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
+        CreateGameResult createGameResult = facade.createGame(createGameRequest);
+        var gameID = createGameResult.gameID();
+        JoinGameRequest joinGameRequest = new JoinGameRequest("black", Integer.toString(gameID));
+        var result = facade.joinGame(joinGameRequest, loginResult.authToken());
+        Assertions.assertNotNull(result);
+    }
+
 //    @Test
 //    void clearTest() throws Exception {
 //        // no email.

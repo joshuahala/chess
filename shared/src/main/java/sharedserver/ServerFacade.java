@@ -47,6 +47,11 @@ public class ServerFacade {
         var path = "/game";
         return makeRequest("GET", authToken, path, null, ListGamesResult.class);
     }
+
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authtoken) throws ResponseException {
+        var path = "/game";
+        return makeRequest("PUT", authtoken, path, joinGameRequest, JoinGameResult.class);
+    }
 //
 //    public void deleteAllPets() throws ResponseException {
 //        var path = "/pet";
