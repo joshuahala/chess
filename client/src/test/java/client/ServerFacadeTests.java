@@ -108,8 +108,17 @@ public class ServerFacadeTests {
     @Test
     public void ListGamesTest() throws Exception {
         LoginResult loginResult = loginUser();
-        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "");
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
         Assertions.assertNotNull(facade.listGames(loginResult.authToken()));
+    }
+    @Test
+    public void ListGamesFailTest() throws Exception {
+        LoginResult loginResult = loginUser();
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
+        var badToken = "bad";
+        Assertions.assertThrows(ResponseException.class, ()->{
+            facade.listGames(badToken);
+        });
     }
 
 //    @Test
