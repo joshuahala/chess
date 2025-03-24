@@ -75,6 +75,19 @@ public class ServerFacadeTests {
         var logoutResult = facade.logout(logoutRequest);
         Assertions.assertTrue(logoutResult.isSuccess());
     }
+    @Test
+    void logoutFailTest() throws Exception{
+        UserData userData = new UserData("player1", "password", "p1@email.com");
+        var registerResult = facade.register(userData);
+        LoginRequest loginRequest = new LoginRequest("player1", "password");
+        var loginResult = facade.login(loginRequest);
+        // bad token
+        var badToken = "not a token";
+        LogoutRequest logoutRequest = new LogoutRequest(badToken);
+        Assertions.assertThrows(ResponseException.class, ()->{
+            var logoutResult = facade.logout(logoutRequest);
+        });
+    }
 
 //    @Test
 //    void clearTest() throws Exception {
