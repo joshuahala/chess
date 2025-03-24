@@ -52,9 +52,17 @@ public class ServerFacadeTests {
         var authData = facade.register(userData);
         LoginRequest loginRequest = new LoginRequest("player1", "password");
         var loginResult = facade.login(loginRequest);
-        System.out.println("" + loginResult);
         Assertions.assertEquals(authData.username(), loginResult.username());
-
+    }
+    @Test
+    void loginFailTest() throws Exception{
+        UserData userData = new UserData("player1", "password", "p1@email.com");
+        var authData = facade.register(userData);
+        // wrong password
+        LoginRequest loginRequest = new LoginRequest("player1", "wrongpassword");
+        Assertions.assertThrows(ResponseException.class, ()->{
+            facade.login(loginRequest);
+        });
     }
 
 //    @Test
