@@ -2,6 +2,8 @@ package sharedserver;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.LoginRequest;
+import model.LoginResult;
 import model.RegisterResult;
 import model.UserData;
 
@@ -10,10 +12,12 @@ import java.net.*;
 
 public class ServerFacade {
 
-    private final String serverUrl;
+    private String port = "8080";
+    private String serverUrl = "http://localhost:";
 
-    public ServerFacade(String url) {
-        serverUrl = url;
+    public ServerFacade(int port) {
+        this.port = Integer.toString(port);
+        this.serverUrl = "http://localhost:" + this.port;
     }
 
 
@@ -25,6 +29,11 @@ public class ServerFacade {
     public void clear() throws ResponseException {
         var path = "/db";
         this.makeRequest("DELETE", path, null, null);
+    }
+
+    public LoginResult login(LoginRequest loginRequest) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, loginRequest, LoginResult.class);
     }
 //
 //    public void deleteAllPets() throws ResponseException {

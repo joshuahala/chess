@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -16,7 +17,7 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("http://localhost:8080");
+        facade = new ServerFacade(port);
     }
 
     @BeforeEach
@@ -31,19 +32,39 @@ public class ServerFacadeTests {
 
 
     @Test
-    void register() throws Exception {
+    void registerTest() throws Exception {
         UserData userData = new UserData("player1", "password", "p1@email.com");
         var authData = facade.register(userData);
         Assertions.assertTrue(authData.authToken().length() > 10);
     }
     @Test
-    void registerFail() throws Exception {
+    void registerFailTest() throws Exception {
         // no email.
         UserData userData = new UserData("player1", "password", "");
         Assertions.assertThrows(ResponseException.class, ()-> {
-            var authData = facade.register(userData);
+            facade.register(userData);
 
         });
     }
+    @Test
+    void loginTest() throws Exception{
+        UserData userData = new UserData("player1", "password", "p1@email.com");
+        var authData = facade.register(userData);
+        LoginRequest loginRequest = new LoginRequest("player1", "password");
+        var loginResult = facade.login(loginRequest);
+        System.out.println("" + loginResult);
+        Assertions.assertEquals(authData.username(), loginResult.username());
+
+    }
+
+//    @Test
+//    void clearTest() throws Exception {
+//        // no email.
+//        UserData userData = new UserData("player1", "password", "email");
+//        facade.register(userData);
+//        facade.clear();
+//
+//    }
+
 
 }
