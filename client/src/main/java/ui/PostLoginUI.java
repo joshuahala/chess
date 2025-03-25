@@ -1,15 +1,18 @@
 package ui;
 
 import exception.ResponseException;
-import model.CreateGameRequest;
-import model.JoinGameRequest;
-import model.LogoutRequest;
-import model.LogoutResult;
+import model.*;
 import sharedserver.ServerFacade;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class PostLoginUI implements ClientUI{
 
     public String authToken = "";
+    private HashMap<String, GameDataWithoutGames> gamesList = new HashMap<>();
+    private int listLength = 0;
 
     public PostLoginUI(String authToken) {
         this.authToken = authToken;
@@ -26,6 +29,9 @@ public class PostLoginUI implements ClientUI{
             }
             case "create" -> {
                 return create(args);
+            }
+            case "list" -> {
+                return listGames();
             }
             default -> {
                 return defaultResponse();
@@ -67,6 +73,25 @@ public class PostLoginUI implements ClientUI{
         }
     }
 
+    private ClientResult listGames() throws ResponseException {
+        try {
+            // get games
+            ListGamesResult listResult = server.listGames(authToken);
+            var text = "Games:%n";
+            Collection<GameDataWithoutGames> games = listResult.games();
+            ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>(games);
+            // create games list text for output
+            for (GameDataWithoutGames game : gamesArray) {
+                int index = gamesArray.indexOf(game) + 1;
+                text = text + Integer.toString(index) + " : " + game.gameName() + "%n";
+            }
+            return new ClientResult(ClientType.POSTLOGIN, "", text);
+
+        } catch (Exception error) {
+            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+        }
+    }
+
 //    private ClientResult join(String[] args) throws ResponseException {
 //        try {
 //            String gameID = "";
@@ -79,5 +104,12 @@ public class PostLoginUI implements ClientUI{
 //    }
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
+    }
+
+    private void initList(ListGamesResult listResult) {
+        for (GameDataWithoutGames game : listResult.games()) {
+            this.gamesList.put(Integer.toString(this.listLength), game);
+            this.listLength += 1;
+        }
     }
 }
