@@ -1,25 +1,17 @@
 package ui;
 
-import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import sharedserver.ServerFacade;
 
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Objects;
-
-import ui.EscapeSequences.*;
 
 public class PostLoginUI implements ClientUI{
 
     public String authToken = "";
     private ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>();
-    private int listLength = 0;
-
     public PostLoginUI(String authToken) {
         this.authToken = authToken;
     }
@@ -42,7 +34,7 @@ public class PostLoginUI implements ClientUI{
             case "join" -> {
                 return join(args);
             }
-            case "ob" -> {
+            case "observe" -> {
                 return observe(args);
             }
             default -> {
@@ -119,7 +111,7 @@ public class PostLoginUI implements ClientUI{
             } catch (Exception error) {
                 return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid game id");
             }
-            if (indexInt > 1 || indexInt < gamesArray.size()) {
+            if (indexInt < 0 || indexInt > gamesArray.size() - 1) {
                 return new ClientResult(ClientType.POSTLOGIN, "", "No such game exists");
             }
             if (!Objects.equals(args[2], "white") && !Objects.equals(args[2], "black")) {
