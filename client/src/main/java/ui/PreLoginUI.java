@@ -24,7 +24,9 @@ public class PreLoginUI implements ClientUI {
                 return help();
             }
 //            case "quit" -> quit();
-//            case "login" -> login();
+            case "login" -> {
+                return login(args);
+            }
             case "register" -> {
                 return register(args);
             }
@@ -56,6 +58,17 @@ public class PreLoginUI implements ClientUI {
         } catch (Exception error) {
             return new ClientResult(ClientType.PRELOGIN, "","There was an error");
         }
+    }
+
+    private ClientResult login(String[] args) throws ResponseException {
+        try {
+            LoginRequest loginRequest = new LoginRequest(args[1], args[2]);
+            LoginResult loginResult = server.login(loginRequest);
+            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in");
+        } catch (Exception error) {
+            return new ClientResult(ClientType.PRELOGIN, "", "Error:" + error);
+        }
+
     }
 
     private ClientResult defaultResponse() {
