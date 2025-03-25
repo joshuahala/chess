@@ -1,6 +1,8 @@
 package ui;
 
 import exception.ResponseException;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
 import model.LogoutRequest;
 import model.LogoutResult;
 import sharedserver.ServerFacade;
@@ -13,13 +15,17 @@ public class PostLoginUI implements ClientUI{
         this.authToken = authToken;
     }
     ServerFacade server = new ServerFacade(8080);
-    public ClientResult eval(String arg) throws ResponseException {
-        switch (arg) {
+    public ClientResult eval(String line) throws ResponseException {
+        var args = line.split(" ");
+        switch (args[0]) {
             case "help" -> {
                 return help();
             }
             case "logout" -> {
                 return logout();
+            }
+            case "create" -> {
+                return create(args);
             }
             default -> {
                 return defaultResponse();
@@ -50,8 +56,27 @@ public class PostLoginUI implements ClientUI{
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
         }
-
     }
+    private ClientResult create(String[] args) throws ResponseException {
+        try {
+            CreateGameRequest createGameRequest = new CreateGameRequest(authToken, args[1]);
+            server.createGame(createGameRequest);
+            return new ClientResult(ClientType.POSTLOGIN, "", "you created a game!");
+        } catch (Exception error) {
+            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+        }
+    }
+
+//    private ClientResult join(String[] args) throws ResponseException {
+//        try {
+//            String gameID = "";
+//            String playerColor = args[2];
+//            JoinGameRequest joinGameRequest = new JoinGameRequest()
+//            server.joinGame(joinGameRequest, authToken);
+//        } catch (Exception error) {
+//            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+//        }
+//    }
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
     }
