@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
+
 import ui.EscapeSequences.*;
 
 public class PostLoginUI implements ClientUI{
@@ -75,6 +77,9 @@ public class PostLoginUI implements ClientUI{
     }
     private ClientResult create(String[] args) throws ResponseException {
         try {
+            if (args.length != 2) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+            }
             CreateGameRequest createGameRequest = new CreateGameRequest(authToken, args[1]);
             server.createGame(createGameRequest);
             return new ClientResult(ClientType.POSTLOGIN, "", "you created a game!");
@@ -104,6 +109,22 @@ public class PostLoginUI implements ClientUI{
 
     private ClientResult join(String[] args) throws ResponseException {
         try {
+            if (args.length != 3) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+            }
+            String indexString = args[1];
+            int indexInt = -1;
+            try {
+                indexInt = (Integer.parseInt(indexString) - 1);
+            } catch (Exception error) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid game id");
+            }
+            if (indexInt > 1 || indexInt < gamesArray.size()) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "No such game exists");
+            }
+            if (!Objects.equals(args[2], "white") && !Objects.equals(args[2], "black")) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid team color; eg. white or black");
+            }
             BoardPrinter boardPrinter = new BoardPrinter(args[2]);
             boardPrinter.print();
 //            int gameIndex = Integer.parseInt(args[1]) - 1;
@@ -126,6 +147,6 @@ public class PostLoginUI implements ClientUI{
         }
     }
     private ClientResult defaultResponse() {
-        return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
+        return new ClientResult(ClientType.POSTLOGIN,"", "Please enter a valid command. Type help to see list of commands.");
     }
 }

@@ -49,6 +49,9 @@ public class PreLoginUI implements ClientUI {
 
     private ClientResult register(String[] args) throws ResponseException {
         try {
+            if (args.length != 4) {
+                return new ClientResult(ClientType.PRELOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+            }
             // create user and register
             UserData userData = new UserData(args[1], args[2], args[3]);
             RegisterResult Registerresult = server.register(userData);
@@ -64,6 +67,9 @@ public class PreLoginUI implements ClientUI {
 
     private ClientResult login(String[] args) throws ResponseException {
         try {
+            if (args.length != 3) {
+                return new ClientResult(ClientType.PRELOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+            }
             LoginRequest loginRequest = new LoginRequest(args[1], args[2]);
             LoginResult loginResult = server.login(loginRequest);
             return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in");
@@ -78,6 +84,6 @@ public class PreLoginUI implements ClientUI {
     }
 
     private ClientResult defaultResponse() {
-        return new ClientResult(ClientType.PRELOGIN,"", "type something real punk");
+        return new ClientResult(ClientType.PRELOGIN,"", "Please enter a valid command. Type help to see list of commands.");
     }
 }
