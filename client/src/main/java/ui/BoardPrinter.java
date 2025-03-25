@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class BoardPrinter {
     private static String playerColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -97,19 +98,36 @@ public class BoardPrinter {
     }
     private void printContent(int row, int col) {
 
-        if (col == 0 || col == 9) {
-            if (row != 0 && row != 9) {
-                out.print(" " + (10-(row+1)) + " ");
-            } else {
-                out.print("   ");
-            }
+        if (Objects.equals(team, "black")) {
+            if (col == 0 || col == 9) {
+                if (row != 0 && row != 9) {
+                    out.print(" " + row + " ");
+                } else {
+                    out.print("   ");
+                }
 
-        } else if (row == 0 || row == 9) {
-            if (col != 0 && col != 9) {
-                out.print(letters.get(col));
+            } else if (row == 0 || row == 9) {
+                if (col != 0 && col != 9) {
+                    out.print(letters.get(col));
+                }
+            } else if (col > 0 && col < 9 && row > 0 && row < 9) {
+                out.print(generator.next());
             }
-        } else if (col > 0 && col < 9 && row > 0 && row < 9) {
-            out.print(generator.next());
+        } else {
+            if (col == 0 || col == 9) {
+                if (row != 0 && row != 9) {
+                    out.print(" " + (10-(row+1)) + " ");
+                } else {
+                    out.print("   ");
+                }
+
+            } else if (row == 0 || row == 9) {
+                if (col != 0 && col != 9) {
+                    out.print(letters.get(col));
+                }
+            } else if (col > 0 && col < 9 && row > 0 && row < 9) {
+                out.print(generator.next());
+            }
         }
     }
 }

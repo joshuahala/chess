@@ -42,7 +42,7 @@ public class PreLoginUI implements ClientUI {
     private ClientResult help() {
         var text ="" + EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL> - to create an account%n" +
                 "login <USERNAME> <PASSWORD> - to play chess%n" +
-                "quit - playing chess" +
+                "quit - playing chess%n" +
                 "help - with possible commands";
         return new ClientResult(ClientType.PRELOGIN, "", text);
     }

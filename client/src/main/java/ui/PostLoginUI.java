@@ -91,12 +91,17 @@ public class PostLoginUI implements ClientUI{
             // get games
             ListGamesResult listResult = server.listGames(authToken);
             var text = "Games:%n";
+            var whiteName = "__";
+            var blackName = "__";
             Collection<GameDataWithoutGames> games = listResult.games();
             gamesArray = new ArrayList<>(games);
             // create games list text for output
             for (GameDataWithoutGames game : gamesArray) {
                 int index = gamesArray.indexOf(game) + 1;
-                text = text + Integer.toString(index) + " : " + game.gameName() + "%n";
+                whiteName = game.whiteUsername() != null? game.whiteUsername() : "";
+                blackName = game.blackUsername() != null? game.blackUsername() : "";
+                text = text + "#" + Integer.toString(index) + " Game Name: " + game.gameName() + "   White: " +
+                        whiteName + " " + "  Black: " + blackName + " " +   "%n";
             }
             return new ClientResult(ClientType.POSTLOGIN, "", text);
 
@@ -123,14 +128,20 @@ public class PostLoginUI implements ClientUI{
             if (!Objects.equals(args[2], "white") && !Objects.equals(args[2], "black")) {
                 return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid team color; eg. white or black");
             }
-            BoardPrinter boardPrinter = new BoardPrinter(args[2]);
-            boardPrinter.print();
-//            int gameIndex = Integer.parseInt(args[1]) - 1;
-//            int gameID = gamesArray.get(gameIndex).gameID();
-//            String playerColor = args[2];
-//            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
-//            server.joinGame(joinGameRequest, authToken);
-            return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game ");
+
+            try {
+                int gameIndex = Integer.parseInt(args[1]) - 1;
+                int gameID = gamesArray.get(gameIndex).gameID();
+                String playerColor = args[2];
+                JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
+                server.joinGame(joinGameRequest, authToken);
+                BoardPrinter boardPrinter = new BoardPrinter(args[2]);
+                boardPrinter.print();
+                return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game ");
+            } catch (Exception error) {
+                return new ClientResult(ClientType.POSTLOGIN, "", "This game slot is already taken. ");
+            }
+
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
         }
