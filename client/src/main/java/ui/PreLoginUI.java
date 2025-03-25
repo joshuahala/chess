@@ -54,7 +54,7 @@ public class PreLoginUI implements ClientUI {
             }
             // create user and register
             UserData userData = new UserData(args[1], args[2], args[3]);
-            RegisterResult Registerresult = server.register(userData);
+            RegisterResult registerResult = server.register(userData);
             // login user
             LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
             LoginResult loginResult = server.login(loginRequest);

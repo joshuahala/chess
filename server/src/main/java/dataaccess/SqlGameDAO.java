@@ -86,51 +86,6 @@ public class SqlGameDAO implements GameDAO {
         executeUpdate(statement);
     }
 
-    //
-//    public Pet getPet(int id) throws ResponseException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT id, json FROM pet WHERE id=?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setInt(1, id);
-//                try (var rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        return readPet(rs);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return null;
-//    }
-//
-//    public Collection<Pet> listPets() throws ResponseException {
-//        var result = new ArrayList<Pet>();
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT id, json FROM pet";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                try (var rs = ps.executeQuery()) {
-//                    while (rs.next()) {
-//                        result.add(readPet(rs));
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
-//        }
-//        return result;
-//    }
-//
-//    public void deletePet(Integer id) throws ResponseException {
-//        var statement = "DELETE FROM pet WHERE id=?";
-//        executeUpdate(statement, id);
-//    }
-//
-//    public void deleteAllPets() throws ResponseException {
-//        var statement = "TRUNCATE pet";
-//        executeUpdate(statement);
-//    }
-//
     private GameData readGameData(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         var whiteUsername = rs.getString("whiteUsername");

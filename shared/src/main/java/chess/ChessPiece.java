@@ -75,6 +75,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         MovesCalculator calculator = new MovesCalculator(board, myPosition);
-        return calculator.PossibleMoves(this.type, this.color);
+        return calculator.possibleMoves(this.type, this.color);
     }
 }

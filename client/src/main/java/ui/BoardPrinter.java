@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class BoardPrinter {
-    private String PLAYER_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private String OPPONENT_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
+    private static String PLAYER_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private static String OPPONENT_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
     private ArrayList<String> lettersWhite = new ArrayList<>(Arrays.asList(" a ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " h "));
     private ArrayList<String> lettersBlack = new ArrayList<>(Arrays.asList(" h ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", " a "));
     private String[] piecesWhite = {

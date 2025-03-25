@@ -15,38 +15,38 @@ public class MovesCalculator {
 
     }
 
-    private boolean IsInBounds(ChessPosition position) {
+    private boolean isInBounds(ChessPosition position) {
         int row = position.getRow();
         int col = position.getColumn();
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 
-    public ArrayList<ChessMove> PossibleMoves(ChessPiece.PieceType type, ChessGame.TeamColor color) {
+    public ArrayList<ChessMove> possibleMoves(ChessPiece.PieceType type, ChessGame.TeamColor color) {
         this.color = color;
         switch(type) {
             case PAWN -> {
-                return this.PawnMoves();
+                return this.pawnMoves();
             }
             case ROOK -> {
-                return this.RookMoves();
+                return this.rookMoves();
             }
             case KNIGHT -> {
-                return this.KnightMoves();
+                return this.knightMoves();
             }
             case BISHOP -> {
-                return this.BishopMoves();
+                return this.bishopMoves();
             }
             case QUEEN -> {
-                return this.QueenMoves();
+                return this.queenMoves();
             }
             case KING -> {
-                return this.KingMoves();
+                return this.kingMoves();
             }
             default -> throw new IllegalArgumentException("Invalid piece type: " + type);
         }
     }
 
-    public ArrayList<ChessMove> BishopMoves() {
+    public ArrayList<ChessMove> bishopMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         int row = position.getRow();
         int col = position.getColumn();
@@ -128,7 +128,7 @@ public class MovesCalculator {
         return moves;
     }
 
-    public ArrayList<ChessMove> KingMoves() {
+    public ArrayList<ChessMove> kingMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         ArrayList<ChessMove> finalList = new ArrayList<>();
         int row = position.getRow();
@@ -144,7 +144,7 @@ public class MovesCalculator {
         moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col-1), null));
         moves.add(new ChessMove(startPosition, new ChessPosition(row-1, col+1), null));
         for (ChessMove move : moves) {
-            if (!IsInBounds(move.getEndPosition())) {
+            if (!isInBounds(move.getEndPosition())) {
                 continue;
             }
             if (board.getPiece(move.getEndPosition()) != null) {
@@ -159,7 +159,7 @@ public class MovesCalculator {
         return finalList;
     }
 
-    public ArrayList<ChessMove> KnightMoves() {
+    public ArrayList<ChessMove> knightMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         ArrayList<ChessMove> finalList = new ArrayList<>();
         int row = position.getRow();
@@ -175,7 +175,7 @@ public class MovesCalculator {
         moves.add(new ChessMove(startPosition, new ChessPosition(row-2, col+1), null));
         moves.add(new ChessMove(startPosition, new ChessPosition(row+2, col-1), null));
         for (ChessMove move : moves) {
-            if (!IsInBounds(move.getEndPosition())) {
+            if (!isInBounds(move.getEndPosition())) {
                 continue;
             }
             if (board.getPiece(move.getEndPosition()) != null) {
@@ -191,7 +191,7 @@ public class MovesCalculator {
     }
 
 
-    private boolean ShouldPromote(ChessPosition newPosition) {
+    private boolean shouldPromote(ChessPosition newPosition) {
         if (this.color == ChessGame.TeamColor.WHITE) {
             if (newPosition.getRow() == 8) {
                 return true;
@@ -205,7 +205,7 @@ public class MovesCalculator {
         return false;
     }
 
-    public ArrayList<ChessMove> PawnMoves() {
+    public ArrayList<ChessMove> pawnMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         ArrayList<ChessMove> finalList = new ArrayList<>();
         int row = position.getRow();
@@ -219,9 +219,9 @@ public class MovesCalculator {
         ChessPosition newPosition;
 
         newPosition = new ChessPosition((row+(1*direction)), col);
-        if (IsInBounds(newPosition)) {
+        if (isInBounds(newPosition)) {
             if (board.getPiece(newPosition) == null) {
-                if (ShouldPromote(newPosition)) {
+                if (shouldPromote(newPosition)) {
                     moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
                     moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
                     moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
@@ -233,10 +233,10 @@ public class MovesCalculator {
         }
 
         newPosition = new ChessPosition((row+(1*direction)), col-1);
-        if (IsInBounds(newPosition)) {
+        if (isInBounds(newPosition)) {
             if (board.getPiece(newPosition) != null) {
                 if (board.getPiece(newPosition).getTeamColor() != this.color) {
-                    if (ShouldPromote(newPosition)) {
+                    if (shouldPromote(newPosition)) {
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
@@ -249,10 +249,10 @@ public class MovesCalculator {
         }
 
         newPosition = new ChessPosition((row+(1*direction)), col+1);
-        if (IsInBounds(newPosition)) {
+        if (isInBounds(newPosition)) {
             if (board.getPiece(newPosition) != null) {
                 if (board.getPiece(newPosition).getTeamColor() != this.color) {
-                    if (ShouldPromote(newPosition)) {
+                    if (shouldPromote(newPosition)) {
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.QUEEN));
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.BISHOP));
                         moves.add(new ChessMove(startPosition, newPosition, ChessPiece.PieceType.ROOK));
@@ -282,7 +282,7 @@ public class MovesCalculator {
         return moves;
     }
 
-    public ArrayList<ChessMove> RookMoves() {
+    public ArrayList<ChessMove> rookMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         ArrayList<ChessMove> finalList = new ArrayList<>();
         int row = position.getRow();
@@ -292,7 +292,7 @@ public class MovesCalculator {
 
         for (int i = row + 1; i < 9; i ++) {
             newPosition = new ChessPosition(i, col);
-            if (IsInBounds(newPosition)) {
+            if (isInBounds(newPosition)) {
                 if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(startPosition, newPosition, null));
                 } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
@@ -305,7 +305,7 @@ public class MovesCalculator {
         }
         for (int i = row - 1; i > 0; i --) {
             newPosition = new ChessPosition(i, col);
-            if (IsInBounds(newPosition)) {
+            if (isInBounds(newPosition)) {
                 if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(startPosition, newPosition, null));
                 } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
@@ -318,7 +318,7 @@ public class MovesCalculator {
         }
         for (int j = col + 1; j < 9; j ++) {
             newPosition = new ChessPosition(row, j);
-            if (IsInBounds(newPosition)) {
+            if (isInBounds(newPosition)) {
                 if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(startPosition, newPosition, null));
                 } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
@@ -331,7 +331,7 @@ public class MovesCalculator {
         }
         for (int j = col - 1; j > 0; j --) {
             newPosition = new ChessPosition(row, j);
-            if (IsInBounds(newPosition)) {
+            if (isInBounds(newPosition)) {
                 if (board.getPiece(newPosition) == null) {
                     moves.add(new ChessMove(startPosition, newPosition, null));
                 } else if (board.getPiece(newPosition).getTeamColor() == this.color) {
@@ -344,10 +344,10 @@ public class MovesCalculator {
         }
         return moves;
     }
-    public ArrayList<ChessMove> QueenMoves() {
+    public ArrayList<ChessMove> queenMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        ArrayList<ChessMove> bishopMoves = BishopMoves();
-        ArrayList<ChessMove> rookMoves = RookMoves();
+        ArrayList<ChessMove> bishopMoves = bishopMoves();
+        ArrayList<ChessMove> rookMoves = rookMoves();
         moves.addAll(bishopMoves);
         moves.addAll(rookMoves);
 

@@ -90,7 +90,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void CreateGameTest() throws Exception {
+    public void createGameTest() throws Exception {
         LoginResult loginResult = loginUser();
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "GameName");
         CreateGameResult createGameResult = facade.createGame(createGameRequest);
@@ -98,7 +98,7 @@ public class ServerFacadeTests {
         Assertions.assertTrue(gameId > 0);
     }
     @Test
-    public void CreateGameFailTest() throws Exception {
+    public void createGameFailTest() throws Exception {
         LoginResult loginResult = loginUser();
         // no game name given
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "");
@@ -108,13 +108,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void ListGamesTest() throws Exception {
+    public void listGamesTest() throws Exception {
         LoginResult loginResult = loginUser();
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
         Assertions.assertNotNull(facade.listGames(loginResult.authToken()));
     }
     @Test
-    public void ListGamesFailTest() throws Exception {
+    public void listGamesFailTest() throws Exception {
         LoginResult loginResult = loginUser();
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
         var badToken = "bad";
@@ -124,7 +124,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void JoinGameTest() throws Exception {
+    public void joinGameTest() throws Exception {
         LoginResult loginResult = loginUser();
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
         CreateGameResult createGameResult = facade.createGame(createGameRequest);
@@ -135,7 +135,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void JoinGameFailTest() throws Exception {
+    public void joinGameFailTest() throws Exception {
         LoginResult loginResult = loginUser();
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "myGame");
         CreateGameResult createGameResult = facade.createGame(createGameRequest);
