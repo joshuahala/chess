@@ -17,7 +17,7 @@ ClientType clientType;
     }
 
     public void run() {
-        System.out.printf("Type something...%n>>>");
+        System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n>>>");
         Scanner scanner = new Scanner(System.in);
         ClientResult result = new ClientResult(ClientType.PRELOGIN, "");
         while (!Objects.equals(result.result(), "quit")) {
@@ -27,7 +27,7 @@ ClientType clientType;
             manageClients(result.type());
 
             System.out.printf("" + this.clientType + "%n");
-            System.out.printf("You typed: " + result.result() + "%n");
+            System.out.printf("" + result.result() + "%n>>>");
 
 
         }

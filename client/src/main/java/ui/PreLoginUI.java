@@ -6,13 +6,28 @@ import java.util.Scanner;
 public class PreLoginUI implements ClientUI {
     public ClientResult eval(String arg) {
         switch (arg) {
-            case "login" -> {
-                return new ClientResult(ClientType.POSTLOGIN, arg);
+            case "help" -> {
+                return help();
             }
+//            case "quit" -> quit();
+//            case "login" -> login();
+//            case "register" -> register();
             default -> {
-                return new ClientResult(ClientType.PRELOGIN, arg);
+                return defaultResponse();
             }
         }
 
+    }
+
+    private ClientResult help() {
+        var text = "register <USERNAME> <PASSWORD> <EMAIL> - to create an account%n" +
+                "login <USERNAME> <PASSWORD> - to play chess%n" +
+                "quit - playing chess" +
+                "help - with possible commands";
+        return new ClientResult(ClientType.PRELOGIN, text);
+    }
+
+    private ClientResult defaultResponse() {
+        return new ClientResult(ClientType.PRELOGIN, "type something real punk");
     }
 }
