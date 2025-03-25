@@ -23,7 +23,9 @@ public class PreLoginUI implements ClientUI {
             case "help" -> {
                 return help();
             }
-//            case "quit" -> quit();
+            case "quit" -> {
+                return quit();
+            }
             case "login" -> {
                 return login(args);
             }
@@ -69,6 +71,10 @@ public class PreLoginUI implements ClientUI {
             return new ClientResult(ClientType.PRELOGIN, "", "Error:" + error);
         }
 
+    }
+
+    private ClientResult quit() throws ResponseException {
+        return new ClientResult(ClientType.PRELOGIN, "", "quit");
     }
 
     private ClientResult defaultResponse() {
