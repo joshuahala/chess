@@ -22,7 +22,6 @@ public class ServerFacade {
         var path = "/user";
         return this.makeRequest("POST", null, path, userData, RegisterResult.class);
     }
-//
     public void clear() throws ResponseException {
         var path = "/db";
         this.makeRequest("DELETE", null, path, null, null);
