@@ -4,9 +4,12 @@ import exception.ResponseException;
 import model.*;
 import sharedserver.ServerFacade;
 
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import ui.EscapeSequences.*;
 
 public class PostLoginUI implements ClientUI{
 
@@ -35,6 +38,9 @@ public class PostLoginUI implements ClientUI{
             }
             case "join" -> {
                 return join(args);
+            }
+            case "ob" -> {
+                return observe(args);
             }
             default -> {
                 return defaultResponse();
@@ -107,8 +113,35 @@ public class PostLoginUI implements ClientUI{
             return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
         }
     }
+    private ClientResult observe(String[] args) throws ResponseException {
+        try {
+            boardText();
+            return new ClientResult(ClientType.POSTLOGIN, "", "");
+        } catch (Exception error) {
+            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+        }
+    }
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
+    }
+
+    private void boardText() {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        for (int i = 0; i < 9; i++) {
+            printRow();
+            out.print(EscapeSequences.RESET_BG_COLOR);
+            out.printf("%n");
+        }
+
+        out.print(EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private void printRow() {
+        for (int i = 0; i < 9; i ++) {
+            var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+            out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            out.print("   ");
+        }
     }
 
 
