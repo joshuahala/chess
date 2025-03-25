@@ -17,17 +17,22 @@ ClientType clientType;
     }
 
     public void run() {
-        System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n>>>");
+        System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n" +
+                EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
         Scanner scanner = new Scanner(System.in);
         ClientResult result = new ClientResult(ClientType.PRELOGIN, "");
         while (!Objects.equals(result.result(), "quit")) {
             String line = scanner.nextLine();
+            try {
 
-            result = client.eval(line);
-            manageClients(result.type());
+                result = client.eval(line);
+                manageClients(result.type());
 
-            System.out.printf("" + this.clientType + "%n");
-            System.out.printf("" + result.result() + "%n>>>");
+                System.out.printf("" + this.clientType + "%n");
+                System.out.printf("" + result.result() + EscapeSequences.SET_TEXT_COLOR_GREEN + "%n>>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+            } catch (Exception exception) {
+                System.out.printf("Please try again");
+            }
 
 
         }
