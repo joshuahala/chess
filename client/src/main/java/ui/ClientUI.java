@@ -1,5 +1,5 @@
 package ui;
 
 public interface ClientUI {
-    String eval(String arg);
+    ClientResult eval(String arg);
 }
