@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class PostLoginUI implements ClientUI{
 
     public String authToken = "";
-    private HashMap<String, GameDataWithoutGames> gamesList = new HashMap<>();
+    private ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>();
     private int listLength = 0;
 
     public PostLoginUI(String authToken) {
@@ -32,6 +32,9 @@ public class PostLoginUI implements ClientUI{
             }
             case "list" -> {
                 return listGames();
+            }
+            case "join" -> {
+                return join(args);
             }
             default -> {
                 return defaultResponse();
@@ -79,7 +82,7 @@ public class PostLoginUI implements ClientUI{
             ListGamesResult listResult = server.listGames(authToken);
             var text = "Games:%n";
             Collection<GameDataWithoutGames> games = listResult.games();
-            ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>(games);
+            gamesArray = new ArrayList<>(games);
             // create games list text for output
             for (GameDataWithoutGames game : gamesArray) {
                 int index = gamesArray.indexOf(game) + 1;
@@ -92,24 +95,21 @@ public class PostLoginUI implements ClientUI{
         }
     }
 
-//    private ClientResult join(String[] args) throws ResponseException {
-//        try {
-//            String gameID = "";
-//            String playerColor = args[2];
-//            JoinGameRequest joinGameRequest = new JoinGameRequest()
-//            server.joinGame(joinGameRequest, authToken);
-//        } catch (Exception error) {
-//            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
-//        }
-//    }
+    private ClientResult join(String[] args) throws ResponseException {
+        try {
+            int gameIndex = Integer.parseInt(args[1]) - 1;
+            int gameID = gamesArray.get(gameIndex).gameID();
+            String playerColor = args[2];
+            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
+            server.joinGame(joinGameRequest, authToken);
+            return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game " + gameID);
+        } catch (Exception error) {
+            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+        }
+    }
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
     }
 
-    private void initList(ListGamesResult listResult) {
-        for (GameDataWithoutGames game : listResult.games()) {
-            this.gamesList.put(Integer.toString(this.listLength), game);
-            this.listLength += 1;
-        }
-    }
+
 }
