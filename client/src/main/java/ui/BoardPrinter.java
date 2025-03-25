@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class BoardPrinter {
-    private static String PLAYER_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private static String OPPONENT_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
+    private static String playerColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private static String opponentColor = EscapeSequences.SET_TEXT_COLOR_RED;
     private ArrayList<String> lettersWhite = new ArrayList<>(Arrays.asList(" a ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " h "));
     private ArrayList<String> lettersBlack = new ArrayList<>(Arrays.asList(" h ", " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", " a "));
     private String[] piecesWhite = {
@@ -49,8 +49,8 @@ public class BoardPrinter {
         if ("black".equals(team)) {
             this.letters = lettersBlack;
             this.pieces = piecesBlack;
-            this.PLAYER_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
-            this.OPPONENT_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+            this.playerColor = EscapeSequences.SET_TEXT_COLOR_RED;
+            this.opponentColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
         }
         generator  = Arrays.stream(pieces).iterator();
     }
@@ -88,9 +88,9 @@ public class BoardPrinter {
     }
     private void setTextColor(int row, int col) {
         if (row > 0 && row < 3 && col > 0 && col < 9) {
-            out.print(OPPONENT_COLOR);
+            out.print(opponentColor);
         } else if (row > 4 && row < 9 && col > 0 && col < 9) {
-            out.print(PLAYER_COLOR);
+            out.print(playerColor);
         } else {
             out.print(EscapeSequences.RESET_TEXT_COLOR);
         }
