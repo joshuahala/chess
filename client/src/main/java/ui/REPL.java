@@ -41,10 +41,12 @@ String authToken = "";
         }
     }
     private void manageClients(ClientResult result) {
-        this.clientType = result.type();
-        switch (result.type()) {
-            case ClientType.PRELOGIN -> this.client = preLoginClient;
-            case ClientType.POSTLOGIN -> this.client = postLoginClient;
+        if (result.type() != clientType) {
+            this.clientType = result.type();
+            switch (result.type()) {
+                case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
+                case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
+            }
         }
     }
 }
