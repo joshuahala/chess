@@ -115,7 +115,8 @@ public class PostLoginUI implements ClientUI{
     }
     private ClientResult observe(String[] args) throws ResponseException {
         try {
-            boardText();
+            BoardPrinter boardPrinter = new BoardPrinter();
+            boardPrinter.print();
             return new ClientResult(ClientType.POSTLOGIN, "", "");
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
@@ -124,25 +125,4 @@ public class PostLoginUI implements ClientUI{
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "type something real punk");
     }
-
-    private void boardText() {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        for (int i = 0; i < 9; i++) {
-            printRow();
-            out.print(EscapeSequences.RESET_BG_COLOR);
-            out.printf("%n");
-        }
-
-        out.print(EscapeSequences.RESET_BG_COLOR);
-    }
-
-    private void printRow() {
-        for (int i = 0; i < 9; i ++) {
-            var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-            out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-            out.print("   ");
-        }
-    }
-
-
 }
