@@ -12,6 +12,11 @@ import java.util.Scanner;
 
 public class PreLoginUI implements ClientUI {
     private ServerFacade server = new ServerFacade(8080);
+    public String authToken = "";
+
+    public PreLoginUI(String authToken) {
+        this.authToken = authToken;
+    }
     public ClientResult eval(String line) throws ResponseException{
         var args = line.split(" ");
         switch (args[0]) {
@@ -35,7 +40,7 @@ public class PreLoginUI implements ClientUI {
                 "login <USERNAME> <PASSWORD> - to play chess%n" +
                 "quit - playing chess" +
                 "help - with possible commands";
-        return new ClientResult(ClientType.PRELOGIN, text);
+        return new ClientResult(ClientType.PRELOGIN, "", text);
     }
 
     private ClientResult register(String[] args) throws ResponseException {
@@ -46,13 +51,14 @@ public class PreLoginUI implements ClientUI {
             // login user
             LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
             LoginResult loginResult = server.login(loginRequest);
-            return new ClientResult(ClientType.POSTLOGIN, "You have logged in");
+
+            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in");
         } catch (Exception error) {
-            return new ClientResult(ClientType.PRELOGIN, "There was an error");
+            return new ClientResult(ClientType.PRELOGIN, "","There was an error");
         }
     }
 
     private ClientResult defaultResponse() {
-        return new ClientResult(ClientType.PRELOGIN, "type something real punk");
+        return new ClientResult(ClientType.PRELOGIN,"", "type something real punk");
     }
 }

@@ -8,11 +8,14 @@ import java.util.Scanner;
 
 public class REPL {
 
-ClientUI client;
+ClientUI preLoginClient = new PreLoginUI("");
+ClientUI postLoginClient = new PostLoginUI("");
+ClientUI client = preLoginClient;
 ClientType clientType;
+String authToken = "";
 
     public REPL() {
-        this.client = new PreLoginUI();
+        this.client = new PreLoginUI("");
         this.clientType = ClientType.PRELOGIN;
     }
 
@@ -20,13 +23,13 @@ ClientType clientType;
         System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n" +
                 EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
         Scanner scanner = new Scanner(System.in);
-        ClientResult result = new ClientResult(ClientType.PRELOGIN, "");
+        ClientResult result = new ClientResult(ClientType.PRELOGIN, "", "");
         while (!Objects.equals(result.result(), "quit")) {
             String line = scanner.nextLine();
             try {
 
                 result = client.eval(line);
-                manageClients(result.type());
+                manageClients(result);
 
                 System.out.printf("" + this.clientType + "%n");
                 System.out.printf("" + result.result() + EscapeSequences.SET_TEXT_COLOR_GREEN + "%n>>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
@@ -37,12 +40,11 @@ ClientType clientType;
 
         }
     }
-    private void manageClients(ClientType type) {
-        this.clientType = type;
-        switch (type) {
-            case ClientType.PRELOGIN -> this.client = new PreLoginUI();
-            case ClientType.POSTLOGIN -> this.client = new PostLoginUI();
-            default -> this.client = new PreLoginUI();
+    private void manageClients(ClientResult result) {
+        this.clientType = result.type();
+        switch (result.type()) {
+            case ClientType.PRELOGIN -> this.client = preLoginClient;
+            case ClientType.POSTLOGIN -> this.client = postLoginClient;
         }
     }
 }
