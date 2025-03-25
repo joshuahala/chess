@@ -14,8 +14,14 @@ public class PostLoginUI implements ClientUI{
     private ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>();
     public PostLoginUI(String authToken) {
         this.authToken = authToken;
+        try {
+            initGamesList();
+        } catch (Exception error) {
+            System.out.printf("" + error);
+        }
     }
     ServerFacade server = new ServerFacade(8080);
+
     public ClientResult eval(String line) throws ResponseException {
         var args = line.split(" ");
         switch (args[0]) {
@@ -47,7 +53,7 @@ public class PostLoginUI implements ClientUI{
         try {
             LogoutRequest logoutRequest = new LogoutRequest(authToken);
             LogoutResult logoutResult = server.logout(logoutRequest);
-            return new ClientResult(ClientType.PRELOGIN, "", "You have logged out");
+            return new ClientResult(ClientType.PRELOGIN, "", "You have logged out. Type help to see available commands.");
 
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", "There was an error");
@@ -140,5 +146,16 @@ public class PostLoginUI implements ClientUI{
     }
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.POSTLOGIN,"", "Please enter a valid command. Type help to see list of commands.");
+    }
+
+    private void initGamesList() throws ResponseException {
+        try {
+            ListGamesResult listResult = server.listGames(this.authToken);
+            Collection<GameDataWithoutGames> games = listResult.games();
+            gamesArray = new ArrayList<>(games);
+        } catch (Exception error) {
+            System.out.println("An error occurred while trying to fetch games.");
+        }
+
     }
 }

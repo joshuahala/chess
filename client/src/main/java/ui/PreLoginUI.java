@@ -59,7 +59,7 @@ public class PreLoginUI implements ClientUI {
             LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
             LoginResult loginResult = server.login(loginRequest);
 
-            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in");
+            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in. Type help to see available commands.");
         } catch (Exception error) {
             return new ClientResult(ClientType.PRELOGIN, "","There was an error");
         }
@@ -72,9 +72,9 @@ public class PreLoginUI implements ClientUI {
             }
             LoginRequest loginRequest = new LoginRequest(args[1], args[2]);
             LoginResult loginResult = server.login(loginRequest);
-            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in");
+            return new ClientResult(ClientType.POSTLOGIN, loginResult.authToken(), "You have logged in. Type help to see available commands.");
         } catch (Exception error) {
-            return new ClientResult(ClientType.PRELOGIN, "", "Error:" + error);
+            return new ClientResult(ClientType.PRELOGIN, "", "An error occurred. Please try a different name or password.");
         }
 
     }

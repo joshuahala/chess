@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class REPL {
 
 ClientUI preLoginClient = new PreLoginUI("");
-ClientUI postLoginClient = new PostLoginUI("");
+ClientUI postLoginClient;
 ClientUI client = preLoginClient;
 ClientType clientType;
 String authToken = "";
@@ -41,12 +41,17 @@ String authToken = "";
         }
     }
     private void manageClients(ClientResult result) {
-        if (result.type() != clientType) {
-            this.clientType = result.type();
-            switch (result.type()) {
-                case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
-                case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
+        try {
+            if (result.type() != clientType) {
+                this.clientType = result.type();
+                switch (result.type()) {
+                    case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
+                    case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
+                }
             }
+
+        } catch (Exception error) {
+            System.out.println("An error occurred");
         }
     }
 }
