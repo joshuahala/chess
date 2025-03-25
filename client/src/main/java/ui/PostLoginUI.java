@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import sharedserver.ServerFacade;
@@ -103,19 +104,21 @@ public class PostLoginUI implements ClientUI{
 
     private ClientResult join(String[] args) throws ResponseException {
         try {
-            int gameIndex = Integer.parseInt(args[1]) - 1;
-            int gameID = gamesArray.get(gameIndex).gameID();
-            String playerColor = args[2];
-            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
-            server.joinGame(joinGameRequest, authToken);
-            return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game " + gameID);
+            BoardPrinter boardPrinter = new BoardPrinter(args[2]);
+            boardPrinter.print();
+//            int gameIndex = Integer.parseInt(args[1]) - 1;
+//            int gameID = gamesArray.get(gameIndex).gameID();
+//            String playerColor = args[2];
+//            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
+//            server.joinGame(joinGameRequest, authToken);
+            return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game ");
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
         }
     }
     private ClientResult observe(String[] args) throws ResponseException {
         try {
-            BoardPrinter boardPrinter = new BoardPrinter();
+            BoardPrinter boardPrinter = new BoardPrinter("white");
             boardPrinter.print();
             return new ClientResult(ClientType.POSTLOGIN, "", "");
         } catch (Exception error) {
