@@ -47,6 +47,7 @@ String authToken = "";
                 switch (result.type()) {
                     case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
                     case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
+                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(result.authToken());
                 }
             }
 

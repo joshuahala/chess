@@ -137,7 +137,7 @@ public class PostLoginUI implements ClientUI{
                 server.joinGame(joinGameRequest, authToken);
                 BoardPrinter boardPrinter = new BoardPrinter(args[2]);
                 boardPrinter.print();
-                return new ClientResult(ClientType.POSTLOGIN, "", "You have joined game ");
+                return new ClientResult(ClientType.GAMEPLAY, "", "You have joined game ");
             } catch (Exception error) {
                 return new ClientResult(ClientType.POSTLOGIN, "", "This game slot is already taken. ");
             }
