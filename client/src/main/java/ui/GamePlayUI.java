@@ -16,6 +16,9 @@ public class GamePlayUI implements ClientUI{
             case "help" -> {
                 return help();
             }
+            case "redraw" -> {
+                return redraw();
+            }
             default -> {
                 return defaultResponse();
             }
@@ -31,6 +34,12 @@ public class GamePlayUI implements ClientUI{
                 "resign - Prompts for confirmation and forfeits the game if confirmed%n" +
                 "highlight <SQUARE> - Highlights legal moves for the piece at the given square (e.g., highlight e2)";
         return new ClientResult(ClientType.GAMEPLAY, "", text);
+    }
+
+    private ClientResult redraw() {
+        BoardPrinter boardPrinter = new BoardPrinter("white");
+        boardPrinter.print();
+        return new ClientResult(ClientType.GAMEPLAY, "", "");
     }
 
     private ClientResult defaultResponse() {
