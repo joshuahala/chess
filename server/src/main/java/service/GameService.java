@@ -101,9 +101,28 @@ public class GameService {
         } else {
             throw new DataAccessException(400, "bad request. please enter a valid color, eg. black or white.");
         }
+    }
 
-
-
+    public void leave(String authToken, int gameID) throws DataAccessException {
+        // check authorization
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
+        // get userData
+        UserData userData = userDAO.getUser(authData.username());
+        try {
+            GameData game = gameDAO.getGame(gameID);
+            var updatedGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+            if (Objects.equals(game.whiteUsername(), authData.username())) {
+                updatedGame = new GameData(game.gameID(), null, game.blackUsername(),game.gameName(), game.game());
+            } else {
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null ,game.gameName(), game.game());
+            }
+            gameDAO.updateGame(updatedGame);
+        } catch (Exception ex) {
+            authData = null;
+        }
     }
 
     public void deleteAllGames() throws DataAccessException {
