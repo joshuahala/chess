@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
+import server.websocket.WebSocketHandler;
 import service.UserService;
 import spark.*;
 import server.handlers.*;
@@ -20,7 +20,6 @@ public class Server {
 //        MemoryGameDAO gameDAO = new MemoryGameDAO();
 //        MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
-        WebSocketHandler wsHandler = new WebSocketHandler();
 
         // mySQL databases
         SqlUserDAO userDAO = null;
@@ -35,9 +34,10 @@ public class Server {
         }
 
 
+
         // Register your endpoints and handle exceptions here.
         Spark.exception(DataAccessException.class, this::errorHandler);
-        Spark.webSocket("/ws", wsHandler);
+        Spark.webSocket("/ws", new WebSocketHandler(authDAO, userDAO, gameDAO));
         Spark.post("/user", new RegisterHandler(userDAO, authDAO));
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
         Spark.post("/session", new LoginHandler(userDAO, authDAO));

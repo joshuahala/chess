@@ -68,7 +68,7 @@ public class PostLoginUI implements ClientUI{
                     "logout - when you are done%n" +
                     "quit - playing chess%n" +
                     "help - with possible commands%n";
-            return new ClientResult(ClientType.POSTLOGIN, "", text);
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, text);
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", 0,  "" + error);
         }
@@ -137,7 +137,7 @@ public class PostLoginUI implements ClientUI{
                 server.joinGame(joinGameRequest, authToken);
                 BoardPrinter boardPrinter = new BoardPrinter(args[2]);
                 boardPrinter.print();
-                return new ClientResult(ClientType.GAMEPLAY, "",gameID, "You have joined game ");
+                return new ClientResult(ClientType.GAMEPLAY, authToken,gameID, "You have joined game ");
             } catch (Exception error) {
                 return new ClientResult(ClientType.POSTLOGIN, "",0, "This game slot is already taken. ");
             }

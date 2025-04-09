@@ -25,7 +25,7 @@ Integer gameID = 0;
         System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n" +
                 EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
         Scanner scanner = new Scanner(System.in);
-        ClientResult result = new ClientResult(ClientType.PRELOGIN, "", "");
+        ClientResult result = new ClientResult(ClientType.PRELOGIN, "", 0, "");
         while (!Objects.equals(result.result(), "quit")) {
             String line = scanner.nextLine();
             try {
