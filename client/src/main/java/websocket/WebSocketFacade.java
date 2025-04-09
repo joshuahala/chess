@@ -1,14 +1,13 @@
 package websocket;
+import com.google.gson.Gson;
+import exception.ResponseException;
+import websocket.commands.UserGameCommand;
+
 import javax.websocket.*;
 import java.net.URI;
 
 public class WebSocketFacade extends Endpoint {
 
-    public static void main(String[] args) throws Exception {
-        var ws = new WebSocketFacade();
-
-        ws.send("This is a ws test.");
-    }
 
     public Session session;
 
@@ -24,10 +23,19 @@ public class WebSocketFacade extends Endpoint {
         });
     }
 
-    public void send(String msg) throws Exception {
+    private void send(String msg) throws Exception {
         this.session.getBasicRemote().sendText(msg);
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void leave(String authToken, Integer gameID) throws ResponseException {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
 }
