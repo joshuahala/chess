@@ -2,12 +2,25 @@ package ui;
 
 import exception.ResponseException;
 import sharedserver.ServerFacade;
+import websocket.WebSocketFacade;
 
 public class GamePlayUI implements ClientUI{
     public String authToken = "";
+    public int gameID = 0;
     private ServerFacade server = new ServerFacade(8080);
+    private WebSocketFacade ws;
     public GamePlayUI(String authToken) {
         this.authToken = authToken;
+    }
+
+    public GamePlayUI(String authToken, int gameID) {
+        try {
+            this.authToken = authToken;
+            this.gameID = gameID;
+            this.ws = new WebSocketFacade();
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     public ClientResult eval(String line) throws ResponseException {
@@ -18,6 +31,9 @@ public class GamePlayUI implements ClientUI{
             }
             case "redraw" -> {
                 return redraw();
+            }
+            case "leave" -> {
+                return leave();
             }
             default -> {
                 return defaultResponse();
@@ -40,6 +56,11 @@ public class GamePlayUI implements ClientUI{
         BoardPrinter boardPrinter = new BoardPrinter("white");
         boardPrinter.print();
         return new ClientResult(ClientType.GAMEPLAY, "", "");
+    }
+
+    private ClientResult leave() {
+        ws.leave(authToken, gameID);
+        return new ClientResult(ClientType.POSTLOGIN, "", "");
     }
 
     private ClientResult defaultResponse() {

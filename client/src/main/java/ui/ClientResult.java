@@ -1,4 +1,4 @@
 package ui;
 
-public record ClientResult(ClientType type, String authToken, String result) {
+public record ClientResult(ClientType type, String authToken, int gameID, String result) {
 }

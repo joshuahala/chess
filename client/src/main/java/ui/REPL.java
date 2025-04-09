@@ -14,6 +14,8 @@ ClientUI client = preLoginClient;
 ClientType clientType;
 String authToken = "";
 
+Integer gameID = 0;
+
     public REPL() {
         this.client = new PreLoginUI("");
         this.clientType = ClientType.PRELOGIN;
@@ -47,7 +49,7 @@ String authToken = "";
                 switch (result.type()) {
                     case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
                     case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
-                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(result.authToken());
+                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(result.authToken(), result.gameID());
                 }
             }
 

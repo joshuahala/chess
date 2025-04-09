@@ -30,12 +30,12 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void leave(String authToken, Integer gameID) throws ResponseException {
+    public void leave(String authToken, Integer gameID){
         try {
             var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
+            System.out.println(ex.getMessage());
         }
     }
 }

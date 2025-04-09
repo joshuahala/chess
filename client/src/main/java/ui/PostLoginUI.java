@@ -53,10 +53,10 @@ public class PostLoginUI implements ClientUI{
         try {
             LogoutRequest logoutRequest = new LogoutRequest(authToken);
             LogoutResult logoutResult = server.logout(logoutRequest);
-            return new ClientResult(ClientType.PRELOGIN, "", "You have logged out. Type help to see available commands.");
+            return new ClientResult(ClientType.PRELOGIN, "", 0, "You have logged out. Type help to see available commands.");
 
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "There was an error");
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, "There was an error");
         }
     }
     private ClientResult help() {
@@ -70,19 +70,19 @@ public class PostLoginUI implements ClientUI{
                     "help - with possible commands%n";
             return new ClientResult(ClientType.POSTLOGIN, "", text);
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+            return new ClientResult(ClientType.POSTLOGIN, "", 0,  "" + error);
         }
     }
     private ClientResult create(String[] args) throws ResponseException {
         try {
             if (args.length != 2) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+                return new ClientResult(ClientType.POSTLOGIN, "", 0, "Invalid number of command arguments. Type help to see available commands.");
             }
             CreateGameRequest createGameRequest = new CreateGameRequest(authToken, args[1]);
             server.createGame(createGameRequest);
-            return new ClientResult(ClientType.POSTLOGIN, "", "you created a game!");
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, "you created a game!");
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, "" + error);
         }
     }
 
@@ -103,30 +103,30 @@ public class PostLoginUI implements ClientUI{
                 text = text + "#" + Integer.toString(index) + " Game Name: " + game.gameName() + "   White: " +
                         whiteName + " " + "  Black: " + blackName + " " +   "%n";
             }
-            return new ClientResult(ClientType.POSTLOGIN, "", text);
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, text);
 
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+            return new ClientResult(ClientType.POSTLOGIN, "",0, "" + error);
         }
     }
 
     private ClientResult join(String[] args) throws ResponseException {
         try {
             if (args.length != 3) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "Invalid number of command arguments. Type help to see available commands.");
+                return new ClientResult(ClientType.POSTLOGIN, "", 0, "Invalid number of command arguments. Type help to see available commands.");
             }
             String indexString = args[1];
             int indexInt = -1;
             try {
                 indexInt = (Integer.parseInt(indexString) - 1);
             } catch (Exception error) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid game id");
+                return new ClientResult(ClientType.POSTLOGIN, "", 0, "Please enter a valid game id");
             }
             if (indexInt < 0 || indexInt > gamesArray.size() - 1) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "No such game exists");
+                return new ClientResult(ClientType.POSTLOGIN, "",0, "No such game exists");
             }
             if (!Objects.equals(args[2], "white") && !Objects.equals(args[2], "black")) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "Please enter a valid team color; eg. white or black");
+                return new ClientResult(ClientType.POSTLOGIN, "",0, "Please enter a valid team color; eg. white or black");
             }
 
             try {
@@ -137,26 +137,26 @@ public class PostLoginUI implements ClientUI{
                 server.joinGame(joinGameRequest, authToken);
                 BoardPrinter boardPrinter = new BoardPrinter(args[2]);
                 boardPrinter.print();
-                return new ClientResult(ClientType.GAMEPLAY, "", "You have joined game ");
+                return new ClientResult(ClientType.GAMEPLAY, "",gameID, "You have joined game ");
             } catch (Exception error) {
-                return new ClientResult(ClientType.POSTLOGIN, "", "This game slot is already taken. ");
+                return new ClientResult(ClientType.POSTLOGIN, "",0, "This game slot is already taken. ");
             }
 
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+            return new ClientResult(ClientType.POSTLOGIN, "",0, "" + error);
         }
     }
     private ClientResult observe(String[] args) throws ResponseException {
         try {
             BoardPrinter boardPrinter = new BoardPrinter("white");
             boardPrinter.print();
-            return new ClientResult(ClientType.POSTLOGIN, "", "");
+            return new ClientResult(ClientType.POSTLOGIN, "", 0,"");
         } catch (Exception error) {
-            return new ClientResult(ClientType.POSTLOGIN, "", "" + error);
+            return new ClientResult(ClientType.POSTLOGIN, "", 0,"" + error);
         }
     }
     private ClientResult defaultResponse() {
-        return new ClientResult(ClientType.POSTLOGIN,"", "Please enter a valid command. Type help to see list of commands.");
+        return new ClientResult(ClientType.POSTLOGIN,"", 0, "Please enter a valid command. Type help to see list of commands.");
     }
 
     private void initGamesList() throws ResponseException {
