@@ -18,6 +18,7 @@ public class GamePlayUI implements ClientUI{
             this.authToken = authToken;
             this.gameID = gameID;
             this.ws = new WebSocketFacade();
+            addConnection();
         } catch (Exception exception) {
             System.out.println("gameplay error:" + exception.getMessage());
         }
@@ -65,5 +66,9 @@ public class GamePlayUI implements ClientUI{
 
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.GAMEPLAY,"",0, "Please enter a valid command. Type help to see list of commands.");
+    }
+
+    private void addConnection() {
+        ws.connect(authToken, gameID);
     }
 }

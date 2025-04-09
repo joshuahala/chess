@@ -38,4 +38,12 @@ public class WebSocketFacade extends Endpoint {
             System.out.println(ex.getMessage());
         }
     }
+    public void connect(String authToken, int gameID){
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

@@ -15,20 +15,22 @@ public class WebSocketHandler {
     UserDAO userDAO;
     GameDAO gameDAO;
     GameService gameService;
+    ConnectionManager connections = new ConnectionManager();
     public WebSocketHandler(AuthDAO authDAO, UserDAO userDAO, GameDAO gameDAO){
         this.authDAO = authDAO;
         this.userDAO = userDAO;
         this.gameDAO = gameDAO;
         gameService = new GameService(userDAO, authDAO, gameDAO);
-
     }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         if (message != null) {
+
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             switch(command.getCommandType()) {
                 case LEAVE -> {leave(command);}
+                case CONNECT -> connect(command, session);
                 default -> {defaultCase();}
             }
             session.getRemote().sendString("WebSocket response: " + message);
@@ -40,6 +42,14 @@ public class WebSocketHandler {
             gameService.leave(command.getAuthToken(), command.getGameID());
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    private void connect(UserGameCommand command, Session session) {
+        try {
+            connections.add(command.getAuthToken(), session);
+        } catch (Exception ex) {
+            System.out.println("Error connecting");
         }
     }
 
