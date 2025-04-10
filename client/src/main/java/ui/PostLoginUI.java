@@ -152,9 +152,25 @@ public class PostLoginUI implements ClientUI{
         }
     }
     private ClientResult observe(String[] args) throws ResponseException {
+        if (args.length != 2) {
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, "Invalid number of command arguments. Type help to see available commands.");
+        }
+        String indexString = args[1];
+        int indexInt = -1;
         try {
+            indexInt = (Integer.parseInt(indexString) - 1);
+        } catch (Exception error) {
+            return new ClientResult(ClientType.POSTLOGIN, "", 0, "Please enter a valid game id");
+        }
+        if (indexInt < 0 || indexInt > gamesArray.size() - 1) {
+            return new ClientResult(ClientType.POSTLOGIN, "",0, "No such game exists");
+        }
+        try {
+            int gameIndex = Integer.parseInt(args[1]) - 1;
+            int gameID = gamesArray.get(gameIndex).gameID();
             BoardPrinter boardPrinter = new BoardPrinter("white");
             boardPrinter.print();
+            ws.connect(authToken, gameID);
             return new ClientResult(ClientType.POSTLOGIN, "", 0,"");
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, "", 0,"" + error);
