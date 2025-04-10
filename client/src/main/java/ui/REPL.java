@@ -50,7 +50,10 @@ Integer gameID = 0;
                 switch (result.type()) {
                     case ClientType.PRELOGIN -> this.client = new PreLoginUI(cache.authToken);
                     case ClientType.POSTLOGIN -> this.client = new PostLoginUI(cache.authToken);
-                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(cache.authToken, cache.gameID);
+                    case ClientType.GAMEPLAY -> {
+                        this.client = new GamePlayUI(cache);
+                        this.client.initWs();
+                    }
                 }
             }
 

@@ -7,20 +7,32 @@ import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
 public class GamePlayUI implements ClientUI, WsObserver{
-    public String authToken = "";
-    public int gameID = 0;
+    public String authToken;
+    public int gameID;
     public Cache cache = new Cache();
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
     public GameData gameData = new GameData(0, null, null, "", null);
 
-    public GamePlayUI(String authToken, int gameID) {
+    public GamePlayUI(Cache cache) {
         try {
-            this.authToken = authToken;
-            this.gameID = gameID;
+            this.authToken = cache.authToken;
+            this.gameID = cache.gameID;
+            this.gameData = cache.gameData;
+
+
 //            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
         } catch (Exception exception) {
             System.out.println("gameplay error:" + exception.getMessage());
+        }
+    }
+    @Override
+    public void initWs() {
+        try {
+            ws = new WebSocketFacade(this);
+            ws.connect(authToken, gameID);
+        } catch (Exception ex) {
+            System.out.println("Error Initializing websocket");
         }
     }
 
@@ -54,22 +66,18 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private ClientResult redraw() {
-        BoardPrinter boardPrinter = new BoardPrinter("white");
+        BoardPrinter boardPrinter = new BoardPrinter(this.cache.team);
         boardPrinter.print(this.gameData);
         return new ClientResult(ClientType.GAMEPLAY, cache,"");
     }
 
-    public void handleMessage(ServerMessage serverMessage) {
-        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            loadGame(serverMessage);
-        }
-    }
+
 
     private ClientResult leave(){
         cache.authToken = authToken;
         ClientResult result = new ClientResult(ClientType.GAMEPLAY, cache, "An error occured while trying to leave.");
         try {
-            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
+            this.ws = new WebSocketFacade(new GamePlayUI(cache));
             ws.leave(authToken, gameID);
             result = new ClientResult(ClientType.POSTLOGIN, cache, "");
         } catch (Exception ex) {
@@ -83,12 +91,23 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private void loadGame(ServerMessage serverMessage) {
+        this.gameData = serverMessage.getGame();
 
-        BoardPrinter boardPrinter = new BoardPrinter("white");
+        BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
         boardPrinter.print(serverMessage.getGame());
     }
 
-//    private void addConnection() {
+    public void handleMessage(ServerMessage serverMessage) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            loadGame(serverMessage);
+        }
+    }
+
+    @Override
+    public void setGameData(GameData gameData) {
+        this.gameData = gameData;
+    }
+    //    private void addConnection() {
 //        ws.connect(authToken, gameID);
 //    }
 }

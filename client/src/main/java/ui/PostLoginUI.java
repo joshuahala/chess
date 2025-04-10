@@ -143,10 +143,11 @@ public class PostLoginUI implements ClientUI, WsObserver{
                 server.joinGame(joinGameRequest, authToken);
 //                BoardPrinter boardPrinter = new BoardPrinter(args[2]);
 //                boardPrinter.print();
-                ws = new WebSocketFacade(new PostLoginUI(authToken));
-                ws.connect(authToken, gameID);
+
                 cache.authToken = authToken;
                 cache.gameID = gameID;
+                cache.participantType = "player";
+
                 return new ClientResult(ClientType.GAMEPLAY, cache, "You have joined game ");
             } catch (Exception error) {
                 return new ClientResult(ClientType.POSTLOGIN, cache, "This game slot is already taken. ");
@@ -177,6 +178,7 @@ public class PostLoginUI implements ClientUI, WsObserver{
 //            boardPrinter.print();
             ws = new WebSocketFacade(new PostLoginUI(authToken));
             ws.connect(authToken, gameID);
+
             return new ClientResult(ClientType.POSTLOGIN, cache,"");
         } catch (Exception error) {
             return new ClientResult(ClientType.POSTLOGIN, cache,"" + error);
@@ -199,13 +201,23 @@ public class PostLoginUI implements ClientUI, WsObserver{
 
     private void loadGame(ServerMessage serverMessage) {
 
-        BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
-        boardPrinter.print(serverMessage.getGame());
+//        BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
+//        boardPrinter.print(serverMessage.getGame());
     }
 
     public void handleMessage(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             loadGame(serverMessage);
         }
+    }
+
+    @Override
+    public void setGameData(GameData gameData) {
+
+    }
+
+    @Override
+    public void initWs() {
+
     }
 }

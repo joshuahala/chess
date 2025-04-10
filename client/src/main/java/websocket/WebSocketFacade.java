@@ -53,6 +53,7 @@ public class WebSocketFacade extends Endpoint {
             System.out.println(ex.getMessage());
         }
     }
+
     public void parseMessage(String message) {
         if (message.contains("NOTIFICATION")) {
             NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);

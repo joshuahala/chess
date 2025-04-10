@@ -8,6 +8,7 @@ public class Cache {
     public int gameID = 0;
     public String team = "";
     public GameData gameData;
+    public String participantType = "";
     public Cache() {
 
     }

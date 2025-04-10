@@ -1,10 +1,7 @@
 package ui;
 
 import exception.ResponseException;
-import model.LoginRequest;
-import model.LoginResult;
-import model.RegisterResult;
-import model.UserData;
+import model.*;
 import sharedserver.ServerFacade;
 
 import java.util.Objects;
@@ -89,5 +86,15 @@ public class PreLoginUI implements ClientUI {
 
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.PRELOGIN,emptyCache,"Please enter a valid command. Type help to see list of commands.");
+    }
+
+    @Override
+    public void setGameData(GameData gameData) {
+
+    }
+
+    @Override
+    public void initWs() {
+
     }
 }
