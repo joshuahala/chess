@@ -42,7 +42,7 @@ public class GameService {
         ChessGame game = new ChessGame();
         int newID = newID();
         String gameName = createGameRequest.gameName();
-        GameData gameData = new GameData(newID, null, null, gameName, game);
+        GameData gameData = new GameData(newID, null, null, gameName, game, "false");
         // add gameData to "database"
         gameDAO.createGame(newID, gameData);
         // return result
@@ -57,7 +57,7 @@ public class GameService {
         Collection<GameData> gamesList = gameDAO.getAll();
         Collection<GameDataWithoutGames> modifiedGamesList = gamesList.stream()
                 .map(gameData -> new GameDataWithoutGames(gameData.gameID(), gameData.whiteUsername(),
-                        gameData.blackUsername(), gameData.gameName()))
+                        gameData.blackUsername(), gameData.gameName(), gameData.gameOver()))
                 .collect(Collectors.toList());
 
         return new ListGamesResult(modifiedGamesList);
@@ -91,14 +91,14 @@ public class GameService {
                 throw new DataAccessException(403, "Forbidden");
             }
             GameData modifiedGameData = new GameData(gameData.gameID(), userData.username(), gameData.blackUsername(),
-                    gameData.gameName(), gameData.game());
+                    gameData.gameName(), gameData.game(), gameData.gameOver());
             gameDAO.updateGame(modifiedGameData);
         } else if (Objects.equals(joinRequest.playerColor().toLowerCase(), "black")) {
             if (gameData.blackUsername() != null) {
                 throw new DataAccessException(403, "Forbidden");
             }
             GameData modifiedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), userData.username(),
-                    gameData.gameName(), gameData.game());
+                    gameData.gameName(), gameData.game(), gameData.gameOver());
             gameDAO.updateGame(modifiedGameData);
         } else {
             throw new DataAccessException(400, "bad request. please enter a valid color, eg. black or white.");
@@ -115,16 +115,22 @@ public class GameService {
         UserData userData = userDAO.getUser(authData.username());
         try {
             GameData game = gameDAO.getGame(gameID);
-            var updatedGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+            var updatedGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameOver());
             if (Objects.equals(game.whiteUsername(), authData.username())) {
-                updatedGame = new GameData(game.gameID(), null, game.blackUsername(),game.gameName(), game.game());
+                updatedGame = new GameData(game.gameID(), null, game.blackUsername(),game.gameName(), game.game(), game.gameOver());
             } else {
-                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null ,game.gameName(), game.game());
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null ,game.gameName(), game.game(), game.gameOver());
             }
             gameDAO.updateGame(updatedGame);
         } catch (Exception ex) {
             authData = null;
         }
+    }
+
+    public void resign(int gameID) throws DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game(), "true");
+        gameDAO.updateGame(updatedGame);
     }
 
     public void deleteAllGames() throws DataAccessException {
@@ -153,7 +159,7 @@ public class GameService {
         try {
         // send back updated game to client
             game.makeMove(move);
-            GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game, gameData.gameOver());
             gameDAO.updateGame(updatedGame);
             return updatedGame;
         } catch (Exception ex) {

@@ -44,6 +44,7 @@ public class WebSocketHandler {
                 switch(command.getCommandType()) {
                     case LEAVE -> {leave(command);}
                     case CONNECT -> connect(command, session);
+                    case RESIGN -> resign(command, session);
                     default -> {defaultCase();}
                 }
             }
@@ -104,7 +105,16 @@ public class WebSocketHandler {
         } catch (Exception ex) {
             System.out.println("Server experienced error with move command: " + ex.getMessage());
         }
+    }
 
+    private void resign(UserGameCommand command, Session session) {
+        try {
+            gameService.resign(command.getGameID());
+            session.getRemote().sendString("You have resigned");
+            // send back
+        } catch (Exception ex) {
+            System.out.printf("server error resignin: " + ex.getMessage());
+        }
     }
 
     private void defaultCase() {

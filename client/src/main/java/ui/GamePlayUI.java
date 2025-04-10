@@ -15,7 +15,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     public Cache cache = new Cache();
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
-    public GameData gameData = new GameData(0, null, null, "", null);
+    public GameData gameData = new GameData(0, null, null, "", null, "false");
 
     public GamePlayUI(Cache cache) {
         try {
@@ -51,6 +51,9 @@ public class GamePlayUI implements ClientUI, WsObserver{
             }
             case "leave" -> {
                 return leave();
+            }
+            case "resign" -> {
+                return resign();
             }
             case "move" -> {
                 return move(args[1], args[2]);
@@ -91,6 +94,11 @@ public class GamePlayUI implements ClientUI, WsObserver{
             System.out.println("leave error");
         }
         return result;
+    }
+
+    private ClientResult resign() {
+        ws.resign(authToken, gameID);
+        return new ClientResult(ClientType.GAMEPLAY, this.cache, "");
     }
 
     private ClientResult defaultResponse() {
