@@ -27,6 +27,7 @@ public class WebSocketFacade extends Endpoint {
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 parseMessage(message);
+                System.out.println(message);
 
             }
         });

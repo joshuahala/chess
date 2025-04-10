@@ -48,7 +48,7 @@ public class WebSocketHandler {
                 }
             }
 
-            session.getRemote().sendString("WebSocket response: " + message);
+//            session.getRemote().sendString("WebSocket response: " + message);
         }
     }
 

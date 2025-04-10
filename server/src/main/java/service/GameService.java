@@ -146,9 +146,8 @@ public class GameService {
         // validate move
         MovesCalculator movesCalculator = new MovesCalculator(game.getBoard(),move.getStartPosition());
         ArrayList<ChessMove> possibleMoves = movesCalculator.possibleMoves(piece.getPieceType(), teamColor);
-        if (!possibleMoves.contains(move.getEndPosition())) {
-            System.out.println("not a valid move");
-        }
+
+
 
         // update game in db
         try {

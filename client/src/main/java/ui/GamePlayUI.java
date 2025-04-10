@@ -100,7 +100,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     private void loadGame(ServerMessage serverMessage) {
         this.gameData = serverMessage.getGame();
 
-        BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
+        BoardPrinter boardPrinter = new BoardPrinter(this.cache.team);
         boardPrinter.print(serverMessage.getGame());
     }
 
