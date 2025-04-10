@@ -3,11 +3,16 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import service.GameService;
 import spark.Spark;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
+
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -48,6 +53,22 @@ public class WebSocketHandler {
     private void connect(UserGameCommand command, Session session) {
         try {
             connections.add(command.getAuthToken(), session);
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+            if (Objects.equals(authData.username(), gameData.whiteUsername())) {
+                var message = authData.username() + " has joined the game as White";
+                NotificationMessage notificationMessage = new NotificationMessage(message);
+                connections.broadcast(authData.authToken(),notificationMessage);
+            }
+            if (Objects.equals(authData.username(), gameData.blackUsername())) {
+                var message = authData.username() + " has joined the game as Black";
+                NotificationMessage notificationMessage = new NotificationMessage(message);
+                connections.broadcast(authData.authToken(),notificationMessage);
+            } else {
+                var message = authData.username() + " has joined the game as an Observer";
+                NotificationMessage notificationMessage = new NotificationMessage(message);
+                connections.broadcast(authData.authToken(),notificationMessage);
+            }
         } catch (Exception ex) {
             System.out.println("Error connecting");
         }

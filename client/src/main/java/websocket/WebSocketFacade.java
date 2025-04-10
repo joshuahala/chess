@@ -2,6 +2,8 @@ package websocket;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.net.URI;
@@ -18,7 +20,8 @@ public class WebSocketFacade extends Endpoint {
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
-                System.out.println(message);
+                parseMessage(message);
+
             }
         });
     }
@@ -45,5 +48,12 @@ public class WebSocketFacade extends Endpoint {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+    }
+    public void parseMessage(String message) {
+        if (message.contains("NOTIFICATION")) {
+            NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+            System.out.println(notification.getMessage());
+        }
+        System.out.println(message);
     }
 }

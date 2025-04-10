@@ -7,4 +7,7 @@ public class NotificationMessage extends ServerMessage {
         super(ServerMessageType.NOTIFICATION);  // Call the parent constructor with the correct type
         this.message = message;
     }
+    public String getMessage() {
+        return this.message;
+    }
 }

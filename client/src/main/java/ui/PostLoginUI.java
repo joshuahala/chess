@@ -3,6 +3,7 @@ package ui;
 import exception.ResponseException;
 import model.*;
 import sharedserver.ServerFacade;
+import websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,12 +11,15 @@ import java.util.Objects;
 
 public class PostLoginUI implements ClientUI{
 
+    WebSocketFacade ws;
+
     public String authToken = "";
     private ArrayList<GameDataWithoutGames> gamesArray = new ArrayList<>();
     public PostLoginUI(String authToken) {
         this.authToken = authToken;
         try {
             initGamesList();
+            ws = new WebSocketFacade();
         } catch (Exception error) {
             System.out.printf("" + error);
         }
@@ -137,6 +141,7 @@ public class PostLoginUI implements ClientUI{
                 server.joinGame(joinGameRequest, authToken);
                 BoardPrinter boardPrinter = new BoardPrinter(args[2]);
                 boardPrinter.print();
+                ws.connect(authToken, gameID);
                 return new ClientResult(ClientType.GAMEPLAY, authToken,gameID, "You have joined game ");
             } catch (Exception error) {
                 return new ClientResult(ClientType.POSTLOGIN, "",0, "This game slot is already taken. ");
