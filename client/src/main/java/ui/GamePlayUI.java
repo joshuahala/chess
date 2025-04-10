@@ -11,6 +11,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     public int gameID = 0;
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
+    public GameData gameData = new GameData(0, null, null, "", null);
 
     public GamePlayUI(String authToken, int gameID) {
         try {
@@ -53,7 +54,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
 
     private ClientResult redraw() {
         BoardPrinter boardPrinter = new BoardPrinter("white");
-        boardPrinter.print();
+        boardPrinter.print(this.gameData);
         return new ClientResult(ClientType.GAMEPLAY, "", 0,"");
     }
 
@@ -80,7 +81,9 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private void loadGame(ServerMessage serverMessage) {
-        System.out.println(serverMessage.getGame());
+
+        BoardPrinter boardPrinter = new BoardPrinter("white");
+        boardPrinter.print(serverMessage.getGame());
     }
 
 //    private void addConnection() {

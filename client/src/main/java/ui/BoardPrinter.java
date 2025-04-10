@@ -1,6 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import com.google.gson.Gson;
+import model.GameData;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +46,8 @@ public class BoardPrinter {
     private String[] pieces = piecesWhite;
     Iterator<String> generator;
 
+    ChessBoard theBoard;
+
     public BoardPrinter(String team) {
         this.team = team.toLowerCase();
         this.row = 0;
@@ -56,11 +61,14 @@ public class BoardPrinter {
         generator  = Arrays.stream(pieces).iterator();
     }
 
-    public void print() {
-        boardText();
-    }
-    private void boardText() {
 
+    public void print(GameData gameData) {
+        ChessGame game = new ChessGame();
+        game.setBoard(gameData.game().getBoard());
+        game.setTeamTurn(gameData.game().getTeamTurn());
+        theBoard = game.getBoard();
+
+        System.out.printf("%n");
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col ++) {
                 setBgColor(row,col);
@@ -72,6 +80,7 @@ public class BoardPrinter {
         }
 
         out.print(EscapeSequences.RESET_BG_COLOR);
+        out.printf(EscapeSequences.SET_TEXT_COLOR_GREEN + "%n>>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
     private void setBgColor(int row, int col) {

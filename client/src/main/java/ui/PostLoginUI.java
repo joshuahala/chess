@@ -170,8 +170,8 @@ public class PostLoginUI implements ClientUI, WsObserver{
         try {
             int gameIndex = Integer.parseInt(args[1]) - 1;
             int gameID = gamesArray.get(gameIndex).gameID();
-            BoardPrinter boardPrinter = new BoardPrinter("white");
-            boardPrinter.print();
+//            BoardPrinter boardPrinter = new BoardPrinter("white");
+//            boardPrinter.print();
             ws = new WebSocketFacade(new PostLoginUI(authToken));
             ws.connect(authToken, gameID);
             return new ClientResult(ClientType.POSTLOGIN, "", 0,"");
@@ -194,7 +194,15 @@ public class PostLoginUI implements ClientUI, WsObserver{
 
     }
 
-    public void handleMessage(ServerMessage serverMessage) {
+    private void loadGame(ServerMessage serverMessage) {
 
+        BoardPrinter boardPrinter = new BoardPrinter("white");
+        boardPrinter.print(serverMessage.getGame());
+    }
+
+    public void handleMessage(ServerMessage serverMessage) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            loadGame(serverMessage);
+        }
     }
 }
