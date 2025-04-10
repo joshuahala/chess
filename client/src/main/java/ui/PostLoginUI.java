@@ -4,12 +4,13 @@ import exception.ResponseException;
 import model.*;
 import sharedserver.ServerFacade;
 import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-public class PostLoginUI implements ClientUI{
+public class PostLoginUI implements ClientUI, WsObserver{
 
     WebSocketFacade ws;
 
@@ -19,7 +20,7 @@ public class PostLoginUI implements ClientUI{
         this.authToken = authToken;
         try {
             initGamesList();
-            ws = new WebSocketFacade();
+//            ws = new WebSocketFacade(new PostLoginUI(authToken));
         } catch (Exception error) {
             System.out.printf("" + error);
         }
@@ -139,8 +140,9 @@ public class PostLoginUI implements ClientUI{
                 String playerColor = args[2];
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, Integer.toString(gameID));
                 server.joinGame(joinGameRequest, authToken);
-                BoardPrinter boardPrinter = new BoardPrinter(args[2]);
-                boardPrinter.print();
+//                BoardPrinter boardPrinter = new BoardPrinter(args[2]);
+//                boardPrinter.print();
+                ws = new WebSocketFacade(new PostLoginUI(authToken));
                 ws.connect(authToken, gameID);
                 return new ClientResult(ClientType.GAMEPLAY, authToken,gameID, "You have joined game ");
             } catch (Exception error) {
@@ -170,6 +172,7 @@ public class PostLoginUI implements ClientUI{
             int gameID = gamesArray.get(gameIndex).gameID();
             BoardPrinter boardPrinter = new BoardPrinter("white");
             boardPrinter.print();
+            ws = new WebSocketFacade(new PostLoginUI(authToken));
             ws.connect(authToken, gameID);
             return new ClientResult(ClientType.POSTLOGIN, "", 0,"");
         } catch (Exception error) {
@@ -188,6 +191,10 @@ public class PostLoginUI implements ClientUI{
         } catch (Exception error) {
             System.out.println("An error occurred while trying to fetch games.");
         }
+
+    }
+
+    public void handleMessage(ServerMessage serverMessage) {
 
     }
 }

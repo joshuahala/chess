@@ -1,23 +1,22 @@
 package ui;
 
 import exception.ResponseException;
+import model.GameData;
 import sharedserver.ServerFacade;
 import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
-public class GamePlayUI implements ClientUI{
+public class GamePlayUI implements ClientUI, WsObserver{
     public String authToken = "";
     public int gameID = 0;
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
-    public GamePlayUI(String authToken) {
-        this.authToken = authToken;
-    }
 
     public GamePlayUI(String authToken, int gameID) {
         try {
             this.authToken = authToken;
             this.gameID = gameID;
-            this.ws = new WebSocketFacade();
+//            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
         } catch (Exception exception) {
             System.out.println("gameplay error:" + exception.getMessage());
         }
@@ -58,13 +57,30 @@ public class GamePlayUI implements ClientUI{
         return new ClientResult(ClientType.GAMEPLAY, "", 0,"");
     }
 
-    private ClientResult leave() {
-        ws.leave(authToken, gameID);
-        return new ClientResult(ClientType.POSTLOGIN, authToken, 0, "");
+    public void handleMessage(ServerMessage serverMessage) {
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            loadGame(serverMessage);
+        }
+    }
+
+    private ClientResult leave(){
+        ClientResult result = new ClientResult(ClientType.GAMEPLAY, authToken, 0, "An error occured while trying to leave.");
+        try {
+            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
+            ws.leave(authToken, gameID);
+            result = new ClientResult(ClientType.POSTLOGIN, authToken, 0, "");
+        } catch (Exception ex) {
+            System.out.println("leave error");
+        }
+        return result;
     }
 
     private ClientResult defaultResponse() {
         return new ClientResult(ClientType.GAMEPLAY,"",0, "Please enter a valid command. Type help to see list of commands.");
+    }
+
+    private void loadGame(ServerMessage serverMessage) {
+        System.out.println(serverMessage.getGame());
     }
 
 //    private void addConnection() {
