@@ -196,7 +196,7 @@ public class PostLoginUI implements ClientUI, WsObserver{
 
     private void loadGame(ServerMessage serverMessage) {
 
-        BoardPrinter boardPrinter = new BoardPrinter("white");
+        BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
         boardPrinter.print(serverMessage.getGame());
     }
 

@@ -30,6 +30,12 @@ public class ServerMessage {
     public GameData getGame() {
         return null;
     }
+    public String getUsername() {
+        return null;
+    }
+    public String getTeam() {
+        return null;
+    }
 
     @Override
     public boolean equals(Object o) {

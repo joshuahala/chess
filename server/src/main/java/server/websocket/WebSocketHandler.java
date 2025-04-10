@@ -71,7 +71,15 @@ public class WebSocketHandler {
                 connections.broadcast(authData.authToken(),notificationMessage);
             }
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+            loadGameMessage.username = authData.username();
+            if (Objects.equals(gameData.whiteUsername(), authData.username())) {
+                loadGameMessage.team = "white";
+            }
+            if (Objects.equals(gameData.blackUsername(), authData.username())) {
+                loadGameMessage.team="black";
+            }
             var json = new Gson().toJson(loadGameMessage);
+
             session.getRemote().sendString(json);
         } catch (Exception ex) {
             System.out.println("Error connecting");
