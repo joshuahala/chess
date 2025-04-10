@@ -19,6 +19,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
             this.authToken = cache.authToken;
             this.gameID = cache.gameID;
             this.gameData = cache.gameData;
+            this.cache = cache;
 
 
 //            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
