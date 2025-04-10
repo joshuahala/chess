@@ -16,6 +16,7 @@ import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommandDeserializer;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Objects;
 
@@ -110,7 +111,13 @@ public class WebSocketHandler {
     private void resign(UserGameCommand command, Session session) {
         try {
             gameService.resign(command.getGameID());
-            session.getRemote().sendString("You have resigned");
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+            var message = authData.username() + " has resigned.";
+            NotificationMessage broadcastMessage = new NotificationMessage(message);
+            connections.broadcast(authData.authToken(),broadcastMessage);
+            NotificationMessage notificationMessage = new NotificationMessage("You have resigned");
+            session.getRemote().sendString(new Gson().toJson(notificationMessage));
+
             // send back
         } catch (Exception ex) {
             System.out.printf("server error resignin: " + ex.getMessage());
