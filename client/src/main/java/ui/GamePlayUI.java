@@ -1,12 +1,16 @@
 package ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
 import sharedserver.ServerFacade;
 import websocket.WebSocketFacade;
+import websocket.commands.MakeMoveCommand;
 import websocket.messages.ServerMessage;
 
 public class GamePlayUI implements ClientUI, WsObserver{
+    private String[] colLetters = ["a", "a", "b", "c", "d", "e"]
     public String authToken;
     public int gameID;
     public Cache cache = new Cache();
@@ -48,6 +52,9 @@ public class GamePlayUI implements ClientUI, WsObserver{
             }
             case "leave" -> {
                 return leave();
+            }
+            case "move" -> {
+                move(args[1], args[2]);
             }
             default -> {
                 return defaultResponse();
@@ -97,6 +104,30 @@ public class GamePlayUI implements ClientUI, WsObserver{
         BoardPrinter boardPrinter = new BoardPrinter(serverMessage.getTeam());
         boardPrinter.print(serverMessage.getGame());
     }
+
+    private void move(String from, String to) {
+        int[] fromPos = parseChessPosition(from);
+        int[] toPos = parseChessPosition(to);
+        ChessPosition fromPosition = new ChessPosition(fromPos[1], fromPos[0]);
+        ChessPosition toPosition = new ChessPosition(toPos[1], toPos[0]);
+        ChessMove move = new ChessMove(fromPosition, toPosition, null);
+        MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move);
+        ws.makeMove(moveCommand);
+    }
+    private int[] parseChessPosition(String pos) {
+        if (pos == null || pos.length() != 2) {
+            throw new IllegalArgumentException("Invalid position: " + pos);
+        }
+
+        char file = pos.charAt(0); // e.g. 'e'
+        char rank = pos.charAt(1); // e.g. '4'
+
+        int col = file - 'a' + 1; // 'a' = 1, 'b' = 2, ..., 'h' = 8
+        int row = Character.getNumericValue(rank); // '1' = 1, ..., '8' = 8
+
+        return new int[]{col, row};
+    }
+
 
     public void handleMessage(ServerMessage serverMessage) {
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
