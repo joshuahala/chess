@@ -9,6 +9,7 @@ public class LoadGameMessage extends ServerMessage {
         super(ServerMessageType.LOAD_GAME);  // Call the parent constructor with the correct type
         this.game = game;
     }
+    @Override
     public GameData getGame() {
         return this.game;
     }

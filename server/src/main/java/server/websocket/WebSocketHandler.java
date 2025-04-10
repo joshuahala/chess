@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.*;
 import service.GameService;
 import spark.Spark;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.util.Objects;
@@ -69,6 +70,9 @@ public class WebSocketHandler {
                 NotificationMessage notificationMessage = new NotificationMessage(message);
                 connections.broadcast(authData.authToken(),notificationMessage);
             }
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+            var json = new Gson().toJson(loadGameMessage);
+            session.getRemote().sendString(json);
         } catch (Exception ex) {
             System.out.println("Error connecting");
         }

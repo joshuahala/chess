@@ -1,7 +1,9 @@
 package websocket;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import ui.WsObserver;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -12,12 +14,14 @@ public class WebSocketFacade extends Endpoint {
 
 
     public Session session;
+    private WsObserver wsObserver;
 
-    public WebSocketFacade() throws Exception {
+    public WebSocketFacade(WsObserver observer) throws Exception {
+
         URI uri = new URI("ws://localhost:8080/ws");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
-
+        wsObserver = observer;
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 parseMessage(message);
@@ -53,6 +57,10 @@ public class WebSocketFacade extends Endpoint {
         if (message.contains("NOTIFICATION")) {
             NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
             System.out.println(notification.getMessage());
+        }
+        if (message.contains("LOAD")) {
+            LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+            wsObserver.handleMessage(loadGameMessage);
         }
         System.out.println(message);
     }
