@@ -1,5 +1,7 @@
 package server.websocket;
+import chess.ChessMove;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -9,7 +11,9 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import service.GameService;
 import spark.Spark;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.commands.UserGameCommandDeserializer;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
@@ -32,13 +36,18 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         if (message != null) {
-
-            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            switch(command.getCommandType()) {
-                case LEAVE -> {leave(command);}
-                case CONNECT -> connect(command, session);
-                default -> {defaultCase();}
+            if (message.contains("MOVE")) {
+                MakeMoveCommand command = new Gson().fromJson(message, MakeMoveCommand.class);
+                makeMove(command, session);
+            } else {
+                UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+                switch(command.getCommandType()) {
+                    case LEAVE -> {leave(command);}
+                    case CONNECT -> connect(command, session);
+                    default -> {defaultCase();}
+                }
             }
+
             session.getRemote().sendString("WebSocket response: " + message);
         }
     }
@@ -84,6 +93,18 @@ public class WebSocketHandler {
         } catch (Exception ex) {
             System.out.println("Error connecting");
         }
+    }
+    private void makeMove(MakeMoveCommand command, Session session) {
+        try {
+            System.out.println("received move command");
+            GameData gameData = gameService.makeMove(command);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+            var json = new Gson().toJson(loadGameMessage);
+            session.getRemote().sendString(json);
+        } catch (Exception ex) {
+            System.out.println("Server experienced error with move command: " + ex.getMessage());
+        }
+
     }
 
     private void defaultCase() {

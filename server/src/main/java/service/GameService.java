@@ -1,9 +1,11 @@
 package service;
 
-import chess.ChessGame;
+import chess.*;
 import dataaccess.*;
 import model.*;
+import websocket.commands.MakeMoveCommand;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -127,6 +129,38 @@ public class GameService {
 
     public void deleteAllGames() throws DataAccessException {
         gameDAO.deleteAll();
+    }
+    public GameData makeMove(MakeMoveCommand moveCommand) throws DataAccessException {
+        ChessGame.TeamColor teamColor;
+        if (Objects.equals(moveCommand.team, "white")) {
+            teamColor = ChessGame.TeamColor.WHITE;
+        } else {
+            teamColor = ChessGame.TeamColor.BLACK;
+        }
+        ChessMove move = moveCommand.move;
+        // get game
+        GameData gameData = gameDAO.getGame(moveCommand.getGameID());
+        ChessGame game = gameData.game();
+        ChessBoard board = game.getBoard();
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        // validate move
+        MovesCalculator movesCalculator = new MovesCalculator(game.getBoard(),move.getStartPosition());
+        ArrayList<ChessMove> possibleMoves = movesCalculator.possibleMoves(piece.getPieceType(), teamColor);
+        if (!possibleMoves.contains(move.getEndPosition())) {
+            System.out.println("not a valid move");
+        }
+
+        // update game in db
+        try {
+        // send back updated game to client
+            game.makeMove(move);
+            GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            gameDAO.updateGame(updatedGame);
+            return updatedGame;
+        } catch (Exception ex) {
+            System.out.println("Error updating game move");
+        }
+        return gameData;
     }
 
     private int newID() {

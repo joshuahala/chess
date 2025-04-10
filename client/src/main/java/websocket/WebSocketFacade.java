@@ -56,8 +56,14 @@ public class WebSocketFacade extends Endpoint {
         }
     }
     public void makeMove(MakeMoveCommand moveCommand) {
-        var jsonCommand = new Gson().toJson(moveCommand);
-        this.session.getBasicRemote().sendText(jsonCommand);
+        try {
+            var jsonCommand = new Gson().toJson(moveCommand);
+            System.out.println("sending from ws facade to server");
+            this.session.getBasicRemote().sendText(jsonCommand);
+        } catch (Exception ex) {
+            System.out.println("Error making move");
+        }
+
     }
 
     public void parseMessage(String message) {

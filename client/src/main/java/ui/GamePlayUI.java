@@ -10,7 +10,6 @@ import websocket.commands.MakeMoveCommand;
 import websocket.messages.ServerMessage;
 
 public class GamePlayUI implements ClientUI, WsObserver{
-    private String[] colLetters = ["a", "a", "b", "c", "d", "e"]
     public String authToken;
     public int gameID;
     public Cache cache = new Cache();
@@ -54,7 +53,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
                 return leave();
             }
             case "move" -> {
-                move(args[1], args[2]);
+                return move(args[1], args[2]);
             }
             default -> {
                 return defaultResponse();
@@ -105,14 +104,16 @@ public class GamePlayUI implements ClientUI, WsObserver{
         boardPrinter.print(serverMessage.getGame());
     }
 
-    private void move(String from, String to) {
+    private ClientResult move(String from, String to) {
         int[] fromPos = parseChessPosition(from);
         int[] toPos = parseChessPosition(to);
         ChessPosition fromPosition = new ChessPosition(fromPos[1], fromPos[0]);
         ChessPosition toPosition = new ChessPosition(toPos[1], toPos[0]);
         ChessMove move = new ChessMove(fromPosition, toPosition, null);
-        MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move);
+        MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move, this.cache.team);
+        System.out.println("sending through websocket");
         ws.makeMove(moveCommand);
+        return new ClientResult(ClientType.GAMEPLAY, this.cache, "");
     }
     private int[] parseChessPosition(String pos) {
         if (pos == null || pos.length() != 2) {

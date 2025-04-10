@@ -150,7 +150,7 @@ public class BoardPrinter {
             int boardRow = Objects.equals(team, "black") ? 8 - row : row - 1;
             int boardCol = Objects.equals(team, "black") ? 8 - col : col - 1;
             
-            ChessPiece piece = theBoard.getPiece(new ChessPosition(boardRow + 1, boardCol + 1));
+            ChessPiece piece = theBoard.getPiece(new ChessPosition(9 - (boardRow + 1), boardCol + 1));
             if (piece != null) {
                 String pieceSymbol = getPieceSymbol(piece);
                 out.print(pieceSymbol);
