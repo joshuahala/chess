@@ -9,6 +9,7 @@ import websocket.messages.ServerMessage;
 public class GamePlayUI implements ClientUI, WsObserver{
     public String authToken = "";
     public int gameID = 0;
+    public Cache cache = new Cache();
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
     public GameData gameData = new GameData(0, null, null, "", null);
@@ -49,13 +50,13 @@ public class GamePlayUI implements ClientUI, WsObserver{
                 "move <FROM> <TO> - Makes a move from one square to another (e.g., move e2 e4)%n" +
                 "resign - Prompts for confirmation and forfeits the game if confirmed%n" +
                 "highlight <SQUARE> - Highlights legal moves for the piece at the given square (e.g., highlight e2)";
-        return new ClientResult(ClientType.GAMEPLAY, "", 0,  text);
+        return new ClientResult(ClientType.GAMEPLAY, cache,  text);
     }
 
     private ClientResult redraw() {
         BoardPrinter boardPrinter = new BoardPrinter("white");
         boardPrinter.print(this.gameData);
-        return new ClientResult(ClientType.GAMEPLAY, "", 0,"");
+        return new ClientResult(ClientType.GAMEPLAY, cache,"");
     }
 
     public void handleMessage(ServerMessage serverMessage) {
@@ -65,11 +66,12 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private ClientResult leave(){
-        ClientResult result = new ClientResult(ClientType.GAMEPLAY, authToken, 0, "An error occured while trying to leave.");
+        cache.authToken = authToken;
+        ClientResult result = new ClientResult(ClientType.GAMEPLAY, cache, "An error occured while trying to leave.");
         try {
             this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
             ws.leave(authToken, gameID);
-            result = new ClientResult(ClientType.POSTLOGIN, authToken, 0, "");
+            result = new ClientResult(ClientType.POSTLOGIN, cache, "");
         } catch (Exception ex) {
             System.out.println("leave error");
         }
@@ -77,7 +79,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private ClientResult defaultResponse() {
-        return new ClientResult(ClientType.GAMEPLAY,"",0, "Please enter a valid command. Type help to see list of commands.");
+        return new ClientResult(ClientType.GAMEPLAY, cache, "Please enter a valid command. Type help to see list of commands.");
     }
 
     private void loadGame(ServerMessage serverMessage) {

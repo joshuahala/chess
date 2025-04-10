@@ -25,7 +25,7 @@ Integer gameID = 0;
         System.out.printf("Welcome to CS 240 Chess! Type help to get started.%n" +
                 EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
         Scanner scanner = new Scanner(System.in);
-        ClientResult result = new ClientResult(ClientType.PRELOGIN, "", 0, "");
+        ClientResult result = new ClientResult(ClientType.PRELOGIN, new Cache(), "");
         while (!Objects.equals(result.result(), "quit")) {
             String line = scanner.nextLine();
             try {
@@ -46,10 +46,11 @@ Integer gameID = 0;
         try {
             if (result.type() != clientType) {
                 this.clientType = result.type();
+                Cache cache = result.cache();
                 switch (result.type()) {
-                    case ClientType.PRELOGIN -> this.client = new PreLoginUI(result.authToken());
-                    case ClientType.POSTLOGIN -> this.client = new PostLoginUI(result.authToken());
-                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(result.authToken(), result.gameID());
+                    case ClientType.PRELOGIN -> this.client = new PreLoginUI(cache.authToken);
+                    case ClientType.POSTLOGIN -> this.client = new PostLoginUI(cache.authToken);
+                    case ClientType.GAMEPLAY -> this.client = new GamePlayUI(cache.authToken, cache.gameID);
                 }
             }
 
