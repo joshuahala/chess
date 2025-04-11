@@ -2,6 +2,7 @@ package websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import ui.EscapeSequences;
 import ui.WsObserver;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -78,7 +79,7 @@ public class WebSocketFacade extends Endpoint {
     public void parseMessage(String message) {
         if (message.contains("NOTIFICATION")) {
             NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-            System.out.println(notification.getMessage());
+            System.out.printf("%n" + notification.getMessage() + "%n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.RESET_TEXT_COLOR);
         }
         if (message.contains("LOAD")) {
             LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);

@@ -23,6 +23,7 @@ import java.util.Objects;
 @WebSocket
 public class WebSocketHandler {
     AuthDAO authDAO;
+    AuthData authData;
     UserDAO userDAO;
     GameDAO gameDAO;
     GameService gameService;
@@ -40,6 +41,8 @@ public class WebSocketHandler {
             if (message.contains("MOVE")) {
                 MakeMoveCommand command = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeMove(command, session);
+                authData = authDAO.getAuth(command.getAuthToken());
+
             } else {
                 UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
                 switch(command.getCommandType()) {
@@ -48,7 +51,10 @@ public class WebSocketHandler {
                     case RESIGN -> resign(command, session);
                     default -> {defaultCase();}
                 }
+                authData = authDAO.getAuth(command.getAuthToken());
+
             }
+
 
 //            session.getRemote().sendString("WebSocket response: " + message);
         }
@@ -66,7 +72,6 @@ public class WebSocketHandler {
         try {
             connections.add(command.getAuthToken(), session);
             GameData gameData = gameDAO.getGame(command.getGameID());
-            AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (Objects.equals(authData.username(), gameData.whiteUsername())) {
                 var message = authData.username() + " has joined the game as White";
                 NotificationMessage notificationMessage = new NotificationMessage(message);
@@ -107,6 +112,9 @@ public class WebSocketHandler {
             // broadcast to update other connections
             LoadGameMessage loadMessage = new LoadGameMessage(gameData);
             connections.broadcast(command.getAuthToken(),loadMessage);
+            String moveString = authData.username() + " has made the move: " + command.move.getStartPosition() + " -> " + command.move.getEndPosition();
+            NotificationMessage moveNotification = new NotificationMessage(moveString);
+            connections.broadcast(command.getAuthToken(), moveNotification);
 
         } catch (Exception ex) {
             System.out.println("Server experienced error with move command: " + ex.getMessage());
