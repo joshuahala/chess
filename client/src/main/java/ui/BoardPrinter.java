@@ -116,12 +116,12 @@ public class BoardPrinter {
             int boardRow = Objects.equals(team, "black") ? 8 - row : row - 1;
             int boardCol = Objects.equals(team, "black") ? 8 - col : col - 1;
             
-            ChessPiece piece = theBoard.getPiece(new ChessPosition(boardRow + 1, boardCol + 1));
+            ChessPiece piece = theBoard.getPiece(new ChessPosition(9 - (boardRow + 1), boardCol + 1));
             if (piece != null) {
                 if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    out.print(EscapeSequences.SET_TEXT_COLOR_RED);
-                } else {
                     out.print(EscapeSequences.SET_TEXT_COLOR_BLUE);
+                } else {
+                    out.print(EscapeSequences.SET_TEXT_COLOR_RED);
                 }
             } else {
                 out.print(EscapeSequences.RESET_TEXT_COLOR);

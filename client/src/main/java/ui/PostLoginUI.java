@@ -181,7 +181,7 @@ public class PostLoginUI implements ClientUI, WsObserver{
             ws.connect(authToken, gameID);
             cache.authToken = authToken;
             cache.gameID = gameID;
-            cache.participantType = "player";
+            cache.participantType = "observer";
             cache.team = "white";
 
             return new ClientResult(ClientType.GAMEPLAY, cache,"");
