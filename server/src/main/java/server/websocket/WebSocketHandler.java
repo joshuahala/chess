@@ -98,11 +98,16 @@ public class WebSocketHandler {
     }
     private void makeMove(MakeMoveCommand command, Session session) {
         try {
-            System.out.println("received move command");
+            // update db
             GameData gameData = gameService.makeMove(command);
+            // send back load message
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             var json = new Gson().toJson(loadGameMessage);
             session.getRemote().sendString(json);
+            // broadcast to update other connections
+            LoadGameMessage loadMessage = new LoadGameMessage(gameData);
+            connections.broadcast(command.getAuthToken(),loadMessage);
+
         } catch (Exception ex) {
             System.out.println("Server experienced error with move command: " + ex.getMessage());
         }
