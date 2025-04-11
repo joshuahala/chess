@@ -88,7 +88,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
         ClientResult result = new ClientResult(ClientType.GAMEPLAY, cache, "An error occured while trying to leave.");
         try {
             this.ws = new WebSocketFacade(new GamePlayUI(cache));
-            ws.leave(authToken, gameID);
+            ws.leave(authToken, gameID, cache.participantType);
             result = new ClientResult(ClientType.POSTLOGIN, cache, "");
         } catch (Exception ex) {
             System.out.println("leave error");

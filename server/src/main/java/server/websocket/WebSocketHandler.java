@@ -23,7 +23,6 @@ import java.util.Objects;
 @WebSocket
 public class WebSocketHandler {
     AuthDAO authDAO;
-    AuthData authData;
     UserDAO userDAO;
     GameDAO gameDAO;
     GameService gameService;
@@ -41,17 +40,16 @@ public class WebSocketHandler {
             if (message.contains("MOVE")) {
                 MakeMoveCommand command = new Gson().fromJson(message, MakeMoveCommand.class);
                 makeMove(command, session);
-                authData = authDAO.getAuth(command.getAuthToken());
+
 
             } else {
                 UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
                 switch(command.getCommandType()) {
-                    case LEAVE -> {leave(command);}
+                    case LEAVE -> {leave(command, session);}
                     case CONNECT -> connect(command, session);
                     case RESIGN -> resign(command, session);
                     default -> {defaultCase();}
                 }
-                authData = authDAO.getAuth(command.getAuthToken());
 
             }
 
@@ -60,9 +58,25 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(UserGameCommand command) {
+    private void leave(UserGameCommand command, Session session) {
         try {
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+
+            // update game
             gameService.leave(command.getAuthToken(), command.getGameID());
+            // notify self
+            NotificationMessage selfMessage = new NotificationMessage("You have left the game");
+            session.getRemote().sendString(new Gson().toJson(selfMessage));
+            // broadcast
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            String leftMessage = "";
+            if (Objects.equals(command.getParticipantType(), "player")) {
+                leftMessage = authData.username() + " has left the game.";
+            } else if (Objects.equals(command.getParticipantType(), "observer")) {
+                leftMessage = authData.username() + " is no longer observing.";
+            }
+            NotificationMessage broadcastMessage = new NotificationMessage(leftMessage);
+            connections.broadcast(authData.authToken(), broadcastMessage);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -72,18 +86,18 @@ public class WebSocketHandler {
         try {
             connections.add(command.getAuthToken(), session);
             GameData gameData = gameDAO.getGame(command.getGameID());
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (Objects.equals(authData.username(), gameData.whiteUsername())) {
                 var message = authData.username() + " has joined the game as White";
                 NotificationMessage notificationMessage = new NotificationMessage(message);
                 connections.broadcast(authData.authToken(),notificationMessage);
-            }
-            if (Objects.equals(authData.username(), gameData.blackUsername())) {
+            } else if (Objects.equals(authData.username(), gameData.blackUsername())) {
                 var message = authData.username() + " has joined the game as Black";
                 NotificationMessage notificationMessage = new NotificationMessage(message);
                 connections.broadcast(authData.authToken(),notificationMessage);
             } else {
-                var message = authData.username() + " has joined the game as an Observer";
-                NotificationMessage notificationMessage = new NotificationMessage(message);
+                var obsMessage = authData.username() + " has joined the game as an Observer";
+                NotificationMessage notificationMessage = new NotificationMessage(obsMessage);
                 connections.broadcast(authData.authToken(),notificationMessage);
             }
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
@@ -103,6 +117,8 @@ public class WebSocketHandler {
     }
     private void makeMove(MakeMoveCommand command, Session session) {
         try {
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+
             // update db
             GameData gameData = gameService.makeMove(command);
             // send back load message

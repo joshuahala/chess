@@ -15,6 +15,7 @@ public class UserGameCommand {
     private final String authToken;
 
     private final Integer gameID;
+    public String participantType = "player";
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
@@ -39,6 +40,14 @@ public class UserGameCommand {
 
     public Integer getGameID() {
         return gameID;
+    }
+
+    public void setParticipantType(String type) {
+        this.participantType = type;
+    }
+
+    public String getParticipantType() {
+        return this.participantType;
     }
 
     @Override

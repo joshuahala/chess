@@ -20,11 +20,11 @@ public class ConnectionManager {
         connections.remove(authToken);
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
+    public void broadcast(String excludeSelfAuth, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.authToken.equals(excludeVisitorName)) {
+                if (!c.authToken.equals(excludeSelfAuth)) {
                     c.send(new Gson().toJson(notification));
                 }
             } else {

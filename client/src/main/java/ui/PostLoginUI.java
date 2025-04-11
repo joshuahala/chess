@@ -177,8 +177,8 @@ public class PostLoginUI implements ClientUI, WsObserver{
             int gameID = gamesArray.get(gameIndex).gameID();
 //            BoardPrinter boardPrinter = new BoardPrinter("white");
 //            boardPrinter.print();
-            ws = new WebSocketFacade(new PostLoginUI(authToken));
-            ws.connect(authToken, gameID);
+//            ws = new WebSocketFacade(new PostLoginUI(authToken));
+//            ws.connect(authToken, gameID);
             cache.authToken = authToken;
             cache.gameID = gameID;
             cache.participantType = "observer";

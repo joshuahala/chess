@@ -41,9 +41,10 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void leave(String authToken, Integer gameID){
+    public void leave(String authToken, Integer gameID, String type){
         try {
             var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            command.setParticipantType(type);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -79,7 +80,9 @@ public class WebSocketFacade extends Endpoint {
     public void parseMessage(String message) {
         if (message.contains("NOTIFICATION")) {
             NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-            System.out.printf("%n" + notification.getMessage() + "%n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.RESET_TEXT_COLOR);
+            if (!notification.getMessage().contains("You have")) {
+                System.out.printf("%n" + notification.getMessage() + "%n" + EscapeSequences.SET_TEXT_COLOR_GREEN + ">>>" + EscapeSequences.RESET_TEXT_COLOR);
+            }
         }
         if (message.contains("LOAD")) {
             LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
