@@ -1,5 +1,6 @@
 package server.websocket;
 import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.AuthDAO;
@@ -115,6 +116,13 @@ public class WebSocketHandler {
             System.out.println("Error connecting");
         }
     }
+    private String convertChessPosition(ChessPosition position) {
+        // Convert column number to letter (1 -> a, 2 -> b, etc.)
+        char file = (char) ('a' + (position.getColumn() - 1));
+        // Use row number as is since 1 is already bottom row
+        return String.format("%c%d", file, position.getRow());
+    }
+
     private void makeMove(MakeMoveCommand command, Session session) {
         try {
             AuthData authData = authDAO.getAuth(command.getAuthToken());
@@ -128,7 +136,11 @@ public class WebSocketHandler {
             // broadcast to update other connections
             LoadGameMessage loadMessage = new LoadGameMessage(gameData);
             connections.broadcast(command.getAuthToken(),loadMessage);
-            String moveString = authData.username() + " has made the move: " + command.move.getStartPosition() + " -> " + command.move.getEndPosition();
+            
+            // Convert positions to algebraic notation
+            String startPos = convertChessPosition(command.move.getStartPosition());
+            String endPos = convertChessPosition(command.move.getEndPosition());
+            String moveString = authData.username() + " has made the move: " + startPos + " -> " + endPos;
             NotificationMessage moveNotification = new NotificationMessage(moveString);
             connections.broadcast(command.getAuthToken(), moveNotification);
 
