@@ -168,6 +168,12 @@ public class GameService {
         return gameData;
     }
 
+    public void endGame(int gameID) throws DataAccessException {
+        GameData gameData = gameDAO.getGame(gameID);
+        GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game(), "true");
+        gameDAO.updateGame(updatedGame);
+    }
+
     private int newID() {
         latestID ++;
         return latestID;

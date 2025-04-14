@@ -147,9 +147,20 @@ public class WebSocketHandler {
             connections.broadcast(command.getAuthToken(), moveNotification);
 
             // check for check or checkmate
-            if (game.isInCheck(game.getTeamTurn())) {
+
+            if (game.isInCheckmate(game.getTeamTurn())) {
+                NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in checkmate. That's the game.");
+                connections.broadcast("", checkNotification);
+                gameService.endGame(gameData.gameID());
+            } else if (game.isInCheck(game.getTeamTurn())) {
                 NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in check.");
                 connections.broadcast("", checkNotification);
+            }
+
+            if (game.isInStalemate(game.getTeamTurn())) {
+                NotificationMessage checkNotification = new NotificationMessage("It's a stalemate!");
+                connections.broadcast("", checkNotification);
+                gameService.endGame(gameData.gameID());
             }
 
         } catch (Exception ex) {
