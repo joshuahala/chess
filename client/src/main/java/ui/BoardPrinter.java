@@ -89,24 +89,23 @@ public class BoardPrinter {
         if (row == 0 || row == 9 || col == 0 || col == 9) {
             out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         } else {
-            if (Objects.equals(this.team, "white")) {
-                if ((row + col) % 2 == 0) {
-                    out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+            if ((row + col) % 2 == 0) {
+                out.print(EscapeSequences.SET_BG_COLOR_WHITE);
 
-                } else {
-                    out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+            } else {
+                out.print(EscapeSequences.SET_BG_COLOR_BLACK);
 
-                }
             }
-            if (Objects.equals(this.team, "black")) {
-                if ((row + col) % 2 == 0) {
-                    out.print(EscapeSequences.SET_BG_COLOR_BLACK);
 
-                } else {
-                    out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-
-                }
-            }
+//            if (Objects.equals(this.team, "black")) {
+//                if ((row + col) % 2 == 0) {
+//                    out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+//
+//                } else {
+//                    out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+//
+//                }
+//            }
 
         }
     }
