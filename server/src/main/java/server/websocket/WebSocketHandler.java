@@ -1,4 +1,5 @@
 package server.websocket;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
@@ -129,6 +130,7 @@ public class WebSocketHandler {
 
             // update db
             GameData gameData = gameService.makeMove(command);
+            ChessGame game = gameData.game();
             // send back load message
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             var json = new Gson().toJson(loadGameMessage);
@@ -143,6 +145,12 @@ public class WebSocketHandler {
             String moveString = authData.username() + " has made the move: " + startPos + " -> " + endPos;
             NotificationMessage moveNotification = new NotificationMessage(moveString);
             connections.broadcast(command.getAuthToken(), moveNotification);
+
+            // check for check or checkmate
+            if (game.isInCheck(game.getTeamTurn())) {
+                NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in check.");
+                connections.broadcast("", checkNotification);
+            }
 
         } catch (Exception ex) {
             System.out.println("Server experienced error with move command: " + ex.getMessage());
