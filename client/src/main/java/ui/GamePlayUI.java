@@ -1,13 +1,14 @@
 package ui;
 
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import exception.ResponseException;
 import model.GameData;
 import sharedserver.ServerFacade;
 import websocket.WebSocketFacade;
 import websocket.commands.MakeMoveCommand;
 import websocket.messages.ServerMessage;
+
+import java.util.Collection;
 
 public class GamePlayUI implements ClientUI, WsObserver{
     public String authToken;
@@ -57,6 +58,9 @@ public class GamePlayUI implements ClientUI, WsObserver{
             }
             case "move" -> {
                 return move(args[1], args[2]);
+            }
+            case "highlight" -> {
+                return highLight(args[1]);
             }
             default -> {
                 return defaultResponse();
@@ -121,6 +125,18 @@ public class GamePlayUI implements ClientUI, WsObserver{
         MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move, this.cache.team);
         System.out.println("sending through websocket");
         ws.makeMove(moveCommand);
+        return new ClientResult(ClientType.GAMEPLAY, this.cache, "");
+    }
+
+    private ClientResult highLight(String position) {
+        int[] parsedPosition = parseChessPosition(position);
+        ChessPosition chessPosition = new ChessPosition(parsedPosition[1], parsedPosition[0]);
+        ChessBoard board = this.gameData.game().getBoard();
+        MovesCalculator movesCalculator = new MovesCalculator(board, chessPosition);
+        ChessPiece piece = board.getPiece(chessPosition);
+        Collection<ChessMove> possibleMoves = movesCalculator.possibleMoves(piece.getPieceType(), piece.getTeamColor());
+        BoardPrinter boardPrinter = new BoardPrinter(this.cache.team);
+        boardPrinter.highLight(possibleMoves, gameData);
         return new ClientResult(ClientType.GAMEPLAY, this.cache, "");
     }
     private int[] parseChessPosition(String pos) {

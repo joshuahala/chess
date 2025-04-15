@@ -36,7 +36,7 @@ Integer gameID = 0;
 //                System.out.printf("" + this.clientType + "%n");
                 System.out.printf("" + result.result() + EscapeSequences.SET_TEXT_COLOR_GREEN + "%n>>>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
             } catch (Exception exception) {
-                System.out.printf("Please try again");
+                System.out.printf("Please try again: " + exception.getMessage());
             }
 
 

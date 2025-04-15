@@ -16,7 +16,8 @@ public class GameService {
     public AuthDAO authDAO;
     public UserDAO userDAO;
     private int latestID = 1234;
-    public GameService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO){
+
+    public GameService(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
@@ -117,9 +118,9 @@ public class GameService {
             GameData game = gameDAO.getGame(gameID);
             var updatedGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameOver());
             if (Objects.equals(game.whiteUsername(), authData.username())) {
-                updatedGame = new GameData(game.gameID(), null, game.blackUsername(),game.gameName(), game.game(), game.gameOver());
+                updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game(), game.gameOver());
             } else {
-                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null ,game.gameName(), game.game(), game.gameOver());
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game(), game.gameOver());
             }
             gameDAO.updateGame(updatedGame);
         } catch (Exception ex) {
@@ -136,6 +137,7 @@ public class GameService {
     public void deleteAllGames() throws DataAccessException {
         gameDAO.deleteAll();
     }
+
     public GameData makeMove(MakeMoveCommand moveCommand) throws DataAccessException {
         ChessGame.TeamColor teamColor;
         if (Objects.equals(moveCommand.team, "white")) {
@@ -150,14 +152,13 @@ public class GameService {
         ChessBoard board = game.getBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
         // validate move
-        MovesCalculator movesCalculator = new MovesCalculator(game.getBoard(),move.getStartPosition());
+        MovesCalculator movesCalculator = new MovesCalculator(game.getBoard(), move.getStartPosition());
         ArrayList<ChessMove> possibleMoves = movesCalculator.possibleMoves(piece.getPieceType(), teamColor);
-
 
 
         // update game in db
         try {
-        // send back updated game to client
+            // send back updated game to client
             game.makeMove(move);
             GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game, gameData.gameOver());
             gameDAO.updateGame(updatedGame);
@@ -175,7 +176,7 @@ public class GameService {
     }
 
     private int newID() {
-        latestID ++;
+        latestID++;
         return latestID;
     }
 }

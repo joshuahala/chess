@@ -1,18 +1,12 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import model.GameData;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 public class BoardPrinter {
     private static String playerColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -44,16 +38,21 @@ public class BoardPrinter {
     private int row;
     private int col;
     private String team = "black";
+    private GameData gameData;
+    private ArrayList<ChessPosition> possibleMoves;
     private ArrayList<String> letters = lettersWhite;
     private String[] pieces = piecesWhite;
+    private ChessPosition startPos;
     Iterator<String> generator;
 
     ChessBoard theBoard;
 
     public BoardPrinter(String team) {
+
         this.team = team.toLowerCase();
         this.row = 0;
         this.col = 0;
+
         if ("black".equals(team)) {
             this.letters = lettersBlack;
             this.pieces = piecesBlack;
@@ -63,9 +62,18 @@ public class BoardPrinter {
         generator  = Arrays.stream(pieces).iterator();
     }
 
-
+    public void highLight(Collection<ChessMove> possibleMoves, GameData gameData) {
+        ArrayList<ChessPosition> highlightedPositions = new ArrayList<>();
+        for (ChessMove move : possibleMoves) {
+            highlightedPositions.add(move.getEndPosition());
+            this.startPos = move.getStartPosition();
+        }
+        this.possibleMoves = highlightedPositions;
+        this.print(gameData);
+    }
     public void print(GameData gameData) {
         ChessGame game = new ChessGame();
+        this.gameData = gameData;
         game.setBoard(gameData.game().getBoard());
         game.setTeamTurn(gameData.game().getTeamTurn());
         theBoard = game.getBoard();
@@ -89,12 +97,44 @@ public class BoardPrinter {
         if (row == 0 || row == 9 || col == 0 || col == 9) {
             out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         } else {
-            if ((row + col) % 2 == 0) {
-                out.print(EscapeSequences.SET_BG_COLOR_WHITE);
 
-            } else {
-                out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+            if (Objects.equals(this.team, "white")) {
+                if (this.startPos != null && ((this.startPos.getRow()) == (9 - row)) && ((this.startPos.getColumn()) == (col))) {
+                    out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
 
+                } else if ((row + col) % 2 == 0) {
+                    if (possibleMoves != null && possibleMoves.contains(new ChessPosition(9 - row, col))) {
+                        out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+                    }
+
+                } else {
+                    if (possibleMoves != null && possibleMoves.contains(new ChessPosition(9 - row, col))) {
+                        out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+                    }
+
+                }
+            } else if (Objects.equals(this.team, "black")) {
+                if (this.startPos != null && ((this.startPos.getRow()) == (row)) && ((this.startPos.getColumn()) == (9 - col))) {
+                    out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
+                } else if ((row + col) % 2 == 0) {
+                    if (possibleMoves != null && possibleMoves.contains(new ChessPosition(row, 9 - col))) {
+                        out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+                    }
+
+                } else {
+                    if (possibleMoves != null && possibleMoves.contains(new ChessPosition(row, 9 - col))) {
+                        out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    } else {
+                        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+                    }
+
+                }
             }
 
 //            if (Objects.equals(this.team, "black")) {

@@ -1,5 +1,6 @@
 package websocket;
 import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import ui.EscapeSequences;
@@ -74,8 +75,9 @@ public class WebSocketFacade extends Endpoint {
         } catch (Exception ex) {
             System.out.println("Error making move");
         }
-
     }
+
+
 
     public void parseMessage(String message) {
         if (message.contains("NOTIFICATION")) {
