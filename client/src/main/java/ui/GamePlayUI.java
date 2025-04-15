@@ -17,6 +17,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
     public GameData gameData = new GameData(0, null, null, "", null, "false");
+    private boolean waitingForLeaveConfirmation = false;
 
     public GamePlayUI(Cache cache) {
         try {
@@ -53,6 +54,12 @@ public class GamePlayUI implements ClientUI, WsObserver{
             case "leave" -> {
                 return leave();
             }
+            case "yes" -> {
+                if (waitingForLeaveConfirmation && line.equals("yes")) {
+                    return confirmLeave();
+                }
+                return defaultResponse();
+            }
             case "resign" -> {
                 return resign();
             }
@@ -63,6 +70,10 @@ public class GamePlayUI implements ClientUI, WsObserver{
                 return highLight(args[1]);
             }
             default -> {
+                if (waitingForLeaveConfirmation) {
+                    waitingForLeaveConfirmation = false;
+                    return new ClientResult(ClientType.GAMEPLAY, cache, "Leave cancelled.");
+                }
                 return defaultResponse();
             }
         }
@@ -85,11 +96,15 @@ public class GamePlayUI implements ClientUI, WsObserver{
         return new ClientResult(ClientType.GAMEPLAY, cache,"");
     }
 
-
-
     private ClientResult leave(){
+        waitingForLeaveConfirmation = true;
+        return new ClientResult(ClientType.GAMEPLAY, cache, "Are you sure you want to leave the game? (yes/no)");
+    }
+
+    private ClientResult confirmLeave() {
+        waitingForLeaveConfirmation = false;
         cache.authToken = authToken;
-        ClientResult result = new ClientResult(ClientType.GAMEPLAY, cache, "An error occured while trying to leave.");
+        ClientResult result = new ClientResult(ClientType.GAMEPLAY, cache, "An error occurred while trying to leave.");
         try {
             this.ws = new WebSocketFacade(new GamePlayUI(cache));
             ws.leave(authToken, gameID, cache.participantType);
