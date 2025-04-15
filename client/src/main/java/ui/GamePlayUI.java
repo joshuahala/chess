@@ -71,10 +71,10 @@ public class GamePlayUI implements ClientUI, WsObserver{
     private ClientResult help() {
         var text = "" + EscapeSequences.SET_TEXT_COLOR_BLUE +
                 "help - Displays text informing the user what actions they can take%n" +
-                "redraw - Redraws the chess board upon the user’s request%n" +
-                "leave - Removes the user from the game and returns to the Post-Login UI%n" +
+                "redraw - Redraws the chess board%n" +
+                "leave - Causes you to leave the game. Does not end the game.%n" +
                 "move <FROM> <TO> - Makes a move from one square to another (e.g., move e2 e4)%n" +
-                "resign - Prompts for confirmation and forfeits the game if confirmed%n" +
+                "resign - Choose to end the game.%n" +
                 "highlight <SQUARE> - Highlights legal moves for the piece at the given square (e.g., highlight e2)";
         return new ClientResult(ClientType.GAMEPLAY, cache,  text);
     }
