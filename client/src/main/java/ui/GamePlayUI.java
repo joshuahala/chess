@@ -13,6 +13,7 @@ import java.util.Collection;
 public class GamePlayUI implements ClientUI, WsObserver{
     public String authToken;
     public int gameID;
+    public String team = "white";
     public Cache cache = new Cache();
     private ServerFacade server = new ServerFacade(8080);
     private WebSocketFacade ws;
@@ -25,6 +26,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
             this.gameID = cache.gameID;
             this.gameData = cache.gameData;
             this.cache = cache;
+            this.team = cache.team;
 
 
 //            this.ws = new WebSocketFacade(new GamePlayUI(authToken, gameID));
@@ -116,7 +118,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
     }
 
     private ClientResult resign() {
-        ws.resign(authToken, gameID);
+        ws.resign(authToken, gameID, cache.participantType);
         return new ClientResult(ClientType.GAMEPLAY, this.cache, "");
     }
 
@@ -127,8 +129,12 @@ public class GamePlayUI implements ClientUI, WsObserver{
     private void loadGame(ServerMessage serverMessage) {
         this.gameData = serverMessage.getGame();
 
+
         BoardPrinter boardPrinter = new BoardPrinter(this.cache.team);
         boardPrinter.print(serverMessage.getGame());
+        if (this.gameData.gameOver() == "true") {
+            System.out.printf("That's the game!%n");
+        }
     }
 
     private ClientResult move(String from, String to) {
@@ -137,7 +143,7 @@ public class GamePlayUI implements ClientUI, WsObserver{
         ChessPosition fromPosition = new ChessPosition(fromPos[1], fromPos[0]);
         ChessPosition toPosition = new ChessPosition(toPos[1], toPos[0]);
         ChessMove move = new ChessMove(fromPosition, toPosition, null);
-        MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move, this.cache.team);
+        MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameID, move, team);
         System.out.println("sending through websocket");
         ws.makeMove(moveCommand);
         return new ClientResult(ClientType.GAMEPLAY, this.cache, "");

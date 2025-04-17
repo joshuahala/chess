@@ -74,7 +74,7 @@ public class GameServiceTests {
         Assertions.assertEquals(1235, createGameResult.gameID());
 
         Collection<GameDataWithoutGames> expectedGames = new ArrayList<>();
-        expectedGames.add(new GameDataWithoutGames(1235, null, null, "myGame"));
+        expectedGames.add(new GameDataWithoutGames(1235, null, null, "myGame", "false"));
         ListGamesResult expectedResult = new ListGamesResult(expectedGames);
         // use authToken
 

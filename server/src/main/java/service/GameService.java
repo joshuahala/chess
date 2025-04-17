@@ -128,8 +128,17 @@ public class GameService {
         }
     }
 
-    public void resign(int gameID) throws DataAccessException {
+    public void resign(int gameID, String authToken) throws DataAccessException {
+
         GameData gameData = gameDAO.getGame(gameID);
+        AuthData authData = authDAO.getAuth(authToken);
+        String username = authData.username();
+        if (!Objects.equals(gameData.whiteUsername(), username) && !Objects.equals(gameData.blackUsername(), username)) {
+            throw new DataAccessException(401, "unauthorized");
+        }
+        if (Objects.equals(gameData.gameOver(), "true")) {
+            throw new DataAccessException(401, "unauthorized");
+        }
         GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game(), "true");
         gameDAO.updateGame(updatedGame);
     }
@@ -138,16 +147,28 @@ public class GameService {
         gameDAO.deleteAll();
     }
 
-    public GameData makeMove(MakeMoveCommand moveCommand) throws DataAccessException {
-        ChessGame.TeamColor teamColor;
+    public GameData makeMove(MakeMoveCommand moveCommand) throws Exception {
+        ChessGame.TeamColor teamColor = ChessGame.TeamColor.WHITE;
+        GameData gameData = gameDAO.getGame(moveCommand.getGameID());
+        AuthData authData = authDAO.getAuth(moveCommand.getAuthToken());
+        String username = authData.username();
+        if (!Objects.equals(gameData.whiteUsername(), username) && !Objects.equals(gameData.blackUsername(), username)) {
+            throw new DataAccessException(401, "unauthorized");
+        }
         if (Objects.equals(moveCommand.team, "white")) {
             teamColor = ChessGame.TeamColor.WHITE;
-        } else {
+        } else if (Objects.equals(moveCommand.team, "black")){
             teamColor = ChessGame.TeamColor.BLACK;
+        } else if (Objects.equals(gameData.whiteUsername(), username)) {
+            teamColor = ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            teamColor = ChessGame.TeamColor.BLACK;
+        }
+        else {
+            teamColor = gameData.game().getTeamTurn();
         }
         ChessMove move = moveCommand.move;
         // get game
-        GameData gameData = gameDAO.getGame(moveCommand.getGameID());
         ChessGame game = gameData.game();
         ChessBoard board = game.getBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
@@ -155,18 +176,41 @@ public class GameService {
         MovesCalculator movesCalculator = new MovesCalculator(game.getBoard(), move.getStartPosition());
         ArrayList<ChessMove> possibleMoves = movesCalculator.possibleMoves(piece.getPieceType(), teamColor);
 
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && Objects.equals(moveCommand.team, "black")) {
+            throw new Exception("You can't move that piece");
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(moveCommand.team, "white")) {
+            throw new Exception("You can't move that piece");
+        }
+
 
         // update game in db
         try {
+            if (piece.getTeamColor() != teamColor) {
+                throw new Exception("That's not your piece");
+            }
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && Objects.equals(moveCommand.team, "black")) {
+                throw new Exception("You can't move that piece");
+            }
+            if (piece.getTeamColor() == ChessGame.TeamColor.BLACK && Objects.equals(moveCommand.team, "white")) {
+                throw new Exception("You can't move that piece");
+            }
             // send back updated game to client
+            if (Objects.equals(moveCommand.team, "white") && game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
+                throw new Exception("Wait your turn");
+            }
+            if (Objects.equals(moveCommand.team, "black") && game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                throw new Exception("Wait your turn");
+            }
+
             game.makeMove(move);
             GameData updatedGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game, gameData.gameOver());
             gameDAO.updateGame(updatedGame);
             return updatedGame;
         } catch (Exception ex) {
-            System.out.println("Error updating game move");
+            throw new Exception("Cannot make that move");
         }
-        return gameData;
+
     }
 
     public void endGame(int gameID) throws DataAccessException {

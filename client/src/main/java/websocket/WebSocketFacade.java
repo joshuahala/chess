@@ -7,6 +7,7 @@ import ui.EscapeSequences;
 import ui.WsObserver;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -51,9 +52,10 @@ public class WebSocketFacade extends Endpoint {
             System.out.println(ex.getMessage());
         }
     }
-    public void resign(String authToken, int gameID) {
+    public void resign(String authToken, int gameID, String participantType) {
         try {
             var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            command.setParticipantType(participantType);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -89,6 +91,10 @@ public class WebSocketFacade extends Endpoint {
         if (message.contains("LOAD")) {
             LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
             wsObserver.handleMessage(loadGameMessage);
+        }
+        if (message.contains("ERROR")) {
+            ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+            System.out.println(errorMessage.getMessage());
         }
     }
 }

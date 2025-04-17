@@ -6,6 +6,7 @@ public class LoadGameMessage extends ServerMessage {
     public GameData game;
     public String username;
     public String team;
+    public String message;
 
     public LoadGameMessage(GameData game) {
         super(ServerMessageType.LOAD_GAME);  // Call the parent constructor with the correct type
@@ -22,5 +23,8 @@ public class LoadGameMessage extends ServerMessage {
     @Override
     public String getTeam() {
         return this.team;
+    }
+    public String getMessage() {
+        return this.message;
     }
 }

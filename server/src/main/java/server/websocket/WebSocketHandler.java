@@ -16,10 +16,14 @@ import spark.Spark;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommandDeserializer;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @WebSocket
@@ -28,12 +32,14 @@ public class WebSocketHandler {
     UserDAO userDAO;
     GameDAO gameDAO;
     GameService gameService;
-    ConnectionManager connections = new ConnectionManager();
+    ConnectionManager connections;
+    HashMap<Integer, ConnectionManager> connectionManagers = new HashMap<>();
     public WebSocketHandler(AuthDAO authDAO, UserDAO userDAO, GameDAO gameDAO){
         this.authDAO = authDAO;
         this.userDAO = userDAO;
         this.gameDAO = gameDAO;
         gameService = new GameService(userDAO, authDAO, gameDAO);
+        connections = new ConnectionManager();
     }
 
     @OnWebSocketMessage
@@ -62,13 +68,14 @@ public class WebSocketHandler {
 
     private void leave(UserGameCommand command, Session session) {
         try {
+            setConnectionManager(command.getGameID());
             AuthData authData = authDAO.getAuth(command.getAuthToken());
 
             // update game
             gameService.leave(command.getAuthToken(), command.getGameID());
             // notify self
-            NotificationMessage selfMessage = new NotificationMessage("You have left the game");
-            session.getRemote().sendString(new Gson().toJson(selfMessage));
+//            NotificationMessage selfMessage = new NotificationMessage("You have left the game");
+//            session.getRemote().sendString(new Gson().toJson(selfMessage));
             // broadcast
             GameData gameData = gameDAO.getGame(command.getGameID());
             String leftMessage = "";
@@ -79,13 +86,16 @@ public class WebSocketHandler {
             }
             NotificationMessage broadcastMessage = new NotificationMessage(leftMessage);
             connections.broadcast(authData.authToken(), broadcastMessage);
+            connections.remove(command.getAuthToken());
+            connectionManagers.put(command.getGameID(), connections);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    private void connect(UserGameCommand command, Session session) {
+    private void connect(UserGameCommand command, Session session) throws IOException {
         try {
+            setConnectionManager(command.getGameID());
             connections.add(command.getAuthToken(), session);
             GameData gameData = gameDAO.getGame(command.getGameID());
             AuthData authData = authDAO.getAuth(command.getAuthToken());
@@ -113,8 +123,10 @@ public class WebSocketHandler {
             var json = new Gson().toJson(loadGameMessage);
 
             session.getRemote().sendString(json);
+            connectionManagers.put(command.getGameID(), connections);
         } catch (Exception ex) {
-            System.out.println("Error connecting");
+            ErrorMessage errorMessage = new ErrorMessage("An error occurred while trying to connect");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
     }
     private String convertChessPosition(ChessPosition position) {
@@ -124,63 +136,91 @@ public class WebSocketHandler {
         return String.format("%c%d", file, position.getRow());
     }
 
-    private void makeMove(MakeMoveCommand command, Session session) {
+    private void makeMove(MakeMoveCommand command, Session session) throws IOException {
         try {
+            setConnectionManager(command.getGameID());
             AuthData authData = authDAO.getAuth(command.getAuthToken());
+            if (authData == null) {
+                ErrorMessage errorMessage = new ErrorMessage("bad auth");
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+            }
+            GameData currentGame = gameDAO.getGame(command.getGameID());
+            if (Objects.equals(currentGame.gameOver(), "true")) {
+                ErrorMessage errorMessage = new ErrorMessage("This game has ended");
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
+            } else {
+                // update db
+                GameData gameData = gameService.makeMove(command);
+                ChessGame game = gameData.game();
+                // send back load message
+                LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
+                var json = new Gson().toJson(loadGameMessage);
+                session.getRemote().sendString(json);
+                // broadcast to update other connections
+                LoadGameMessage loadMessage = new LoadGameMessage(gameData);
+                connections.broadcast(command.getAuthToken(),loadMessage);
 
-            // update db
-            GameData gameData = gameService.makeMove(command);
-            ChessGame game = gameData.game();
-            // send back load message
-            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
-            var json = new Gson().toJson(loadGameMessage);
-            session.getRemote().sendString(json);
-            // broadcast to update other connections
-            LoadGameMessage loadMessage = new LoadGameMessage(gameData);
-            connections.broadcast(command.getAuthToken(),loadMessage);
-            
-            // Convert positions to algebraic notation
-            String startPos = convertChessPosition(command.move.getStartPosition());
-            String endPos = convertChessPosition(command.move.getEndPosition());
-            String moveString = authData.username() + " has made the move: " + startPos + " -> " + endPos;
-            NotificationMessage moveNotification = new NotificationMessage(moveString);
-            connections.broadcast(command.getAuthToken(), moveNotification);
+                // Convert positions to algebraic notation
+                String startPos = convertChessPosition(command.move.getStartPosition());
+                String endPos = convertChessPosition(command.move.getEndPosition());
+                String moveString = authData.username() + " has made the move: " + startPos + " -> " + endPos;
+                NotificationMessage moveNotification = new NotificationMessage(moveString);
+                connections.broadcast(command.getAuthToken(), moveNotification);
 
-            // check for check or checkmate
+                // check for check or checkmate
 
-            if (game.isInCheckmate(game.getTeamTurn())) {
-                NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in checkmate. That's the game.");
-                connections.broadcast("", checkNotification);
-                gameService.endGame(gameData.gameID());
-            } else if (game.isInCheck(game.getTeamTurn())) {
-                NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in check.");
-                connections.broadcast("", checkNotification);
+                if (game.isInCheckmate(game.getTeamTurn())) {
+                    NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in checkmate. That's the game.");
+//                connections.broadcast(command.getAuthToken(), checkNotification);
+                    gameService.endGame(gameData.gameID());
+                } else if (game.isInCheck(game.getTeamTurn())) {
+                    NotificationMessage checkNotification = new NotificationMessage(game.getTeamTurn() + " is in check.");
+//                connections.broadcast(command.getAuthToken(), checkNotification);
+                }
+
+                if (game.isInStalemate(game.getTeamTurn())) {
+                    NotificationMessage checkNotification = new NotificationMessage("It's a stalemate!");
+//                connections.broadcast("", checkNotification);
+                    gameService.endGame(gameData.gameID());
+                }
             }
 
-            if (game.isInStalemate(game.getTeamTurn())) {
-                NotificationMessage checkNotification = new NotificationMessage("It's a stalemate!");
-                connections.broadcast("", checkNotification);
-                gameService.endGame(gameData.gameID());
-            }
+            connectionManagers.put(command.getGameID(), connections);
 
         } catch (Exception ex) {
-            System.out.println("Server experienced error with move command: " + ex.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage("Cannot make that move");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
     }
 
-    private void resign(UserGameCommand command, Session session) {
+    private void resign(UserGameCommand command, Session session) throws Exception {
+        setConnectionManager(command.getGameID());
+        if (command.getParticipantType() == "observer") {
+            throw new Exception("Observers can leave, but not resign");
+        }
         try {
-            gameService.resign(command.getGameID());
+            gameService.resign(command.getGameID(), command.getAuthToken());
             AuthData authData = authDAO.getAuth(command.getAuthToken());
             var message = authData.username() + " has resigned.";
             NotificationMessage broadcastMessage = new NotificationMessage(message);
             connections.broadcast(authData.authToken(),broadcastMessage);
             NotificationMessage notificationMessage = new NotificationMessage("You have resigned");
             session.getRemote().sendString(new Gson().toJson(notificationMessage));
-
+            connectionManagers.put(command.getGameID(), connections);
             // send back
         } catch (Exception ex) {
             System.out.printf("server error resignin: " + ex.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage("cannot resign");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+        }
+    }
+
+    private void setConnectionManager(int gameID) {
+        if (connectionManagers.get(gameID) == null) {
+            connections = new ConnectionManager();
+        } else {
+            connections = connectionManagers.get(gameID);
         }
     }
 
