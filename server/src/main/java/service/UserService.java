@@ -1,6 +1,7 @@
 package service;
 import dataaccess.*;
 import model.*;
+import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.util.log.Log;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -26,6 +27,10 @@ public class UserService {
     }
     public RegisterResult register(UserData userData) throws DataAccessException {
         // ensure strings are not empty
+        UserData existing = userDAO.getUser(userData.username());
+        if (existing != null) {
+            throw new DataAccessException(401, "unauthorized");
+        }
         if (Objects.equals(userData.username(), "") || Objects.equals(newHashPassword(userData.password()), "") || Objects.equals(userData.email(), "")) {
             throw new DataAccessException(400, "bad request");
         }
